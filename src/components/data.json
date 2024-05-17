@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Xiaomi",
+    "description": "Get a better understanding of your traffic",
+    "href": "#",
+    "imageUrl": ""
+  },
+  {
+    "id": 2,
+    "name": "Iphone",
+    "description": "Speak directly to your customers",
+    "href": "#",
+    "imageUrl": ""
+  },
+  {
+    "id": 3,
+    "name": "Samsung",
+    "description": "Your customers’ data will be safe and secure",
+    "href": "#",
+    "imageUrl": ""
+  },
+  {
+    "id": 4,
+    "name": "Oppo",
+    "description": "Connect with third-party tools",
+    "href": "#",
+    "imageUrl": ""
+  },
+  {
+    "id": 5,
+    "name": "Nokia",
+    "description": "Build strategic funnels that will convert",
+    "href": "#",
+    "imageUrl": ""
+  }
+]
