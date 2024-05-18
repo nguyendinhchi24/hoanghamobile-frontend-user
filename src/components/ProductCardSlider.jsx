@@ -11,11 +11,11 @@ export default function App() {
     <>
       <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-1 gap-5">
         {/* */}
-        <div className="max-md:col-span-1 py-3 px-3 lg:block hidden rounded-lg bg-white scroll-smooth overflow-hidden lg:overflow-auto lg:max-h-[475px]">
+        <div className="max-md:col-span-1 py-3 px-3 lg:block hidden rounded-lg bg-white scroll-smooth overflow-hidden lg:overflow-auto lg:max-h-[600px]">
           {[...Array(7)].map((_, index) => (
             <div
               key={index}
-              className="flex bg-slate-50 rounded-lg p-3 items-center mb-3"
+              className="flex bg-slate-50 hover:bg-slate-200 cursor-pointer rounded-lg p-3 items-center mb-3"
             >
               <img
                 src={images.product.watch}

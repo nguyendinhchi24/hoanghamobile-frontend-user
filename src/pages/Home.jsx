@@ -8,6 +8,7 @@ import images from "../assets";
 import ProductCard from "../components/ProductCard";
 import SpecialProduct from "../components/SpecialProduct";
 import ProductCardSlider from "../components/ProductCardSlider";
+import { Rating } from "@mui/material";
 
 const Home = () => {
   return (
@@ -57,10 +58,10 @@ const Home = () => {
             </div>
 
             {/* image small */}
-            <div className="md:col-span-2 lg:col-span-1 xl:col-span-1">
-              <div className="grid md:grid-cols-2 lg:grid-cols-1 gap-4">
+            <div className="md:col-span-2 lg:col-span-1 xl:col-span-1 ">
+              <div className="grid md:grid-cols-2 lg:grid-cols-1 gap-4 scroll-smooth overflow-hidden lg:overflow-auto lg:max-h-[640px]">
                 {/* render */}
-                {[...Array(3)].map((_, index) => (
+                {[...Array(5)].map((_, index) => (
                   <div className="relative" key={index}>
                     <img
                       src="https://th.bing.com/th/id/R.d4714a8804369bb03d92649315b2f1d2?rik=8S4WWCxl67NsaQ&pid=ImgRaw&r=0"
@@ -141,7 +142,7 @@ const Home = () => {
               <Link
                 to="/store"
                 key={index}
-                className="relative bg-white rounded-lg shadow-lg overflow-hidden lg:col-span-1"
+                className="relative bg-white hover:bg-slate-200 rounded-lg shadow-lg overflow-hidden lg:col-span-1"
               >
                 <img
                   src={images.product.watch}
@@ -150,10 +151,12 @@ const Home = () => {
                 />
                 <div className="p-4">
                   <p className="text-sm font-medium text-gray-600">Giảm giá</p>
-                  <h2 className="text-lg lg:text-2xl font-semibold text-gray-800 mb-2">
+                  <h2 className="text-lg lg:text-2xl font-semibold transition duration-500 text-gray-800 py-3">
                     Galaxy S24 Ultra
                   </h2>
-                  <p className="text-base font-semibold text-gray-700">
+                  <Rating readOnly defaultValue={4} size="small" />
+
+                  <p className="text-base font-semibold text-red-500">
                     Giá chỉ còn 14.000.000 <sup className="text-sm">đ</sup>
                   </p>
                   <p className="text-sm text-gray-600">
@@ -175,9 +178,8 @@ const Home = () => {
           </h3>
           <div
             className="bg-white rounded-lg p-4
-            grid grid-cols-1 
-            sm:grid-cols-2 md:grid-cols-2 
-            lg:grid-cols-3 xl:grid-cols-6 gap-4"
+            grid grid-cols-1 md:grid-cols-4
+            lg:grid-cols-8 xl:grid-cols-12 gap-4"
           >
             <ProductCard />
             <ProductCard />
