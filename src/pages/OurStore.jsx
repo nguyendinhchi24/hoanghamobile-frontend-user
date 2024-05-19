@@ -251,12 +251,12 @@ const OurStore = () => {
 
       <main className="mx-auto">
         <div
-          className="flex flex-col items-center px-4 border-b border-gray-200 py-2
+          className="flex flex-col items-center px-2 border-b border-gray-200 lg:p-4  p-2
         lg:justify-between 
         lg:flex-row space-y-3
         "
         >
-          <h1 className="text-4xl font-bold tracking-tight uppercase text-gray-900">
+          <h1 className="text-4xl  font-bold tracking-tight uppercase text-gray-900">
             Iphone
           </h1>
           <div className="flex items-center justify-between">
@@ -311,23 +311,16 @@ const OurStore = () => {
             {/* action icon */}
             <div className="items-center pl-3 flex gap-2">
               <button
-                onClick={() => handleGridChange(12)}
+                onClick={() => handleGridChange(3)}
                 type="button"
-                className=" text-white hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-800 ac  rounded-lg opacity-85 hover:opacity-100 active:opacity-100 p-2"
+                className=" text-black hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2"
               >
-                <MdDensityMedium className="h-4 w-4" aria-hidden="true" />
-              </button>
-
-              <button
-                onClick={() => handleGridChange(6)}
-                type="button"
-                className=" text-black hover:text-white hover:bg-slate-800 transition duration-300  bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2"
-              >
-                <MdDensityLarge
+                <MdOutlineDensitySmall
                   className="h-4 w-4 rotate-90"
                   aria-hidden="true"
                 />
               </button>
+
               <button
                 onClick={() => handleGridChange(4)}
                 type="button"
@@ -340,15 +333,24 @@ const OurStore = () => {
               </button>
 
               <button
-                onClick={() => handleGridChange(3)}
+                onClick={() => handleGridChange(6)}
                 type="button"
-                className=" text-black hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2"
+                className=" text-black hover:text-white hover:bg-slate-800 transition duration-300  bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2"
               >
-                <MdOutlineDensitySmall
+                <MdDensityLarge
                   className="h-4 w-4 rotate-90"
                   aria-hidden="true"
                 />
               </button>
+
+              <button
+                onClick={() => handleGridChange(12)}
+                type="button"
+                className=" text-white hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-800 ac  rounded-lg opacity-85 hover:opacity-100 active:opacity-100 p-2"
+              >
+                <MdDensityMedium className="h-4 w-4" aria-hidden="true" />
+              </button>
+
               {/* filter mobile */}
               <button
                 type="button"
@@ -364,7 +366,7 @@ const OurStore = () => {
 
         {/*  */}
         <div className="">
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
             {/* filter */}
             <div className="col-span-1 py-3 px-5 hidden lg:block">
               {/* */}
@@ -639,7 +641,7 @@ const OurStore = () => {
               <div className="bg-white p-5 rounded-lg mb-3">
                 <h3 className="font-semibold text-lg">Sản phẩm liên quan</h3>
                 <div className="  p-3 rounded-lg items-center flex flex-col justify-center ">
-                  {[...Array(4)].map((_, index) => (
+                  {[...Array(1)].map((_, index) => (
                     <Link
                       key={index}
                       to="/store"
@@ -679,7 +681,7 @@ const OurStore = () => {
             {/* product */}
             <div className="col-span-3 py-3 px-5">
               <div className="bg-white p-5 rounded-lg mb-3">
-                <div className="grid grid-cols-12 gap-5">
+                <div className="bg-white rounded-lg gap-4 grid grid-cols-12">
                   <ProductCard grid={grid} />
                   <ProductCard grid={grid} />
                   <ProductCard grid={grid} />

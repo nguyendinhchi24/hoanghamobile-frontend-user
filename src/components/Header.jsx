@@ -74,7 +74,6 @@ export default function Example() {
               className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
               onClick={() => setMobileMenuOpen(true)}
             >
-              <span className="sr-only">Open main menu</span>
               <Bars3Icon className="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
@@ -106,27 +105,24 @@ export default function Example() {
                 leaveFrom="opacity-100 translate-y-0"
                 leaveTo="opacity-0 translate-y-1"
               >
-                <Popover.Panel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-[350px] overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
-                  <div className="px-3 py-2">
+                <Popover.Panel className="absolute -left-8 top-full z-10 mt-3 w-screen max-w-[350px] overflow-hidden rounded-lg bg-white shadow-lg ring-1 ring-gray-900/5">
+                  <div className="px-3 py-3">
                     {products.map((item) => (
-                      <div
+                      <Link
                         key={item.name}
-                        className="group relative flex items-center gap-x-6 rounded-lg p-3 text-sm leading-4 hover:bg-gray-200"
+                        to={item.href}
+                        href={item.href}
+                        className="group relative flex items-center gap-x-6 rounded-lg p-3 text-sm leading-4 hover:bg-gray-200 cursor-pointer"
                       >
                         <div className="flex-auto">
-                          <Link
-                            to={`/product-details/${item.id}`}
-                            href={item.href}
-                            className="block font-semibold hover:text-gray-800 text-black"
-                          >
+                          <div className="block font-semibold hover:text-gray-800 text-black">
                             {item.name}
-                            <span className="absolute inset-0" />
-                          </Link>
-                          <p className="mt-1 text-gray-600">
+                          </div>
+                          <p className="mt-2 indent-2 text-gray-600">
                             {item.description}
                           </p>
                         </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </Popover.Panel>
@@ -134,14 +130,14 @@ export default function Example() {
             </Popover>
 
             <Link
-              to="/repair"
+              to="/contact"
               href="#"
-              className="text-[15px] font-semibold leading-6  text-black outline-none hover:text-cyan-900"
+              className="text-[15px] font-semibold leading-6 hover:text-cyan-900 text-black outline-none"
             >
-              <span>Sửa chữa</span>
+              <span>Liên hệ </span>
             </Link>
             <Link
-              to="/sign-in"
+              to="/login"
               href="#"
               className="text-[15px] font-semibold leading-6 hover:text-cyan-900 text-black outline-none"
             >
@@ -249,7 +245,7 @@ export default function Example() {
                     {({ open }) => (
                       <>
                         <Disclosure.Button className="flex w-full items-center outline-none justify-between rounded-lg py-2 pl-3 pr-3.5 text-[15px] font-semibold leading-7 text-black hover:bg-gray-200">
-                          <span>Sản phẩm</span>
+                          <span>Danh mục</span>
                           <ChevronDownIcon
                             className={classNames(
                               open ? "rotate-180" : "",
@@ -273,12 +269,6 @@ export default function Example() {
                       </>
                     )}
                   </Disclosure>
-                  <Link
-                    to={"/repair"}
-                    className="-mx-3 block rounded-lg px-3 py-2 outline-none text-[15px] font-semibold leading-7 text-black hover:bg-gray-200 "
-                  >
-                    Sửa chữa
-                  </Link>
                 </div>
 
                 <div className="py-6 flex justify-between">

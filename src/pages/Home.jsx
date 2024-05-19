@@ -224,9 +224,8 @@ const Home = () => {
           <div
             className="
             bg-white rounded-lg p-4
-            grid grid-cols-1 
-            sm:grid-cols-2 md:grid-cols-2 
-            lg:grid-cols-3 xl:grid-cols-4 gap-4"
+            grid grid-cols-2 md:grid-cols-4 
+            lg:grid-cols-6 xl:grid-cols-8 gap-4"
           >
             <BlogCard />
             <BlogCard />
