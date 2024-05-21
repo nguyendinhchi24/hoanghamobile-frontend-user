@@ -1,7 +1,5 @@
 import { Link } from "react-router-dom";
-import { FaShippingFast } from "react-icons/fa";
 import Marquee from "react-fast-marquee";
-
 import BlogCard from "../components/BlogCard";
 import category from "./anh1.png";
 import images from "../assets";
@@ -9,12 +7,27 @@ import ProductCard from "../components/ProductCard";
 import SpecialProduct from "../components/SpecialProduct";
 import ProductCardSlider from "../components/ProductCardSlider";
 import { Rating } from "@mui/material";
+import Container from "../components/Container";
+import {
+  FaShippingFast,
+  FaHeadphones,
+  FaUndo,
+  FaMoneyBillWave,
+} from "react-icons/fa";
+import services from "../utils/Data";
+
+const iconMap = {
+  FaShippingFast: FaShippingFast,
+  FaHeadphones: FaHeadphones,
+  FaUndo: FaUndo,
+  FaMoneyBillWave: FaMoneyBillWave,
+};
 
 const Home = () => {
   return (
     <>
-      <div className="bg-slate-100">
-        {/* slider */}
+      {/* slider */}
+      <Container>
         <section className="p-5 ">
           <div className="bg-white p-5 rounded-md grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <div className="md:col-span-2 lg:col-span-2 xl:col-span-3">
@@ -93,8 +106,10 @@ const Home = () => {
             </div>
           </div>
         </section>
+      </Container>
 
-        {/* categories */}
+      {/* categories */}
+      <Container>
         <section className="p-5">
           <div
             className="bg-white rounded-lg p-4 grid grid-cols-1 
@@ -116,8 +131,9 @@ const Home = () => {
             ))}
           </div>
         </section>
-
-        {/* special */}
+      </Container>
+      {/* special */}
+      <Container>
         <section className="p-5">
           <h3 className="text-2xl p-4 text-slate-900 font-semibold">
             Sản phẩm giảm giá
@@ -133,14 +149,15 @@ const Home = () => {
             <SpecialProduct />
           </div>
         </section>
-
-        {/*  */}
+      </Container>
+      {/*  */}
+      <Container>
         <section className="p-5">
           <div className="relative grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Sản phẩm 1 */}
             {[...Array(4)].map((_, index) => (
-              <Link
-                to="/store"
+              <button
+                to="/product"
                 key={index}
                 className="relative bg-white hover:bg-slate-200 rounded-lg shadow-lg overflow-hidden lg:col-span-1"
               >
@@ -166,12 +183,13 @@ const Home = () => {
                 <div className="absolute top-3 right-2 animate-bounce bg-red-500 px-5 py-3 rounded-lg">
                   <p className="text-sm font-semibold text-white">Trả góp 0%</p>
                 </div>
-              </Link>
+              </button>
             ))}
           </div>
         </section>
-
-        {/* featured */}
+      </Container>
+      {/* featured */}
+      <Container>
         <section className="p-5">
           <h3 className="text-2xl p-4 text-slate-900 font-semibold">
             Bộ sửu tập
@@ -181,42 +199,52 @@ const Home = () => {
             grid grid-cols-1 md:grid-cols-4
             lg:grid-cols-8 xl:grid-cols-12 gap-4"
           >
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
-            <ProductCard />
+            <ProductCard grid={2} />
+            <ProductCard grid={2} />
+            <ProductCard grid={2} />
+            <ProductCard grid={2} />
+            <ProductCard grid={2} />
+            <ProductCard grid={2} />
           </div>
         </section>
-
-        {/* pupup */}
+      </Container>
+      {/* pupup */}
+      <Container>
         <section className="p-5">
           <h3 className="text-2xl p-4 text-slate-900 font-semibold">
             Tất cả sản phẩm
           </h3>
           <ProductCardSlider />
         </section>
+      </Container>
 
-        {/* shipping */}
+      {/* shipping */}
+      <Container>
         <section className="p-5">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {[...Array(4)].map((_, index) => (
-              <div
-                className="flex items-center justify-center bg-white p-5 rounded-lg"
-                key={index}
-              >
-                <FaShippingFast className="h-9 w-9" />
-                <div className="px-5">
-                  <h6 className="font-medium text-lg">Free Shipping</h6>
-                  <p className="opacity-80">Cho tất cả đơn hàng hơn 6tr</p>
+            {services.map((service, index) => {
+              const IconComponent = iconMap[service.icon];
+              return (
+                <div
+                  className="flex items-center justify-center bg-white p-4 rounded-lg"
+                  key={index}
+                >
+                  <IconComponent className="h-7 w-7" />
+                  <div className="px-5">
+                    <h6 className="font-medium text-lg">{service.title}</h6>
+                    <p className="opacity-80 text-sm text-gray-600 indent-1">
+                      {service.tagline}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
+      </Container>
 
-        {/* blog */}
+      {/* blog */}
+      <Container>
         <section className="p-5">
           <h3 className="text-2xl p-4 text-slate-900 font-semibold">
             Blog Mới Nhất
@@ -233,7 +261,9 @@ const Home = () => {
             <BlogCard />
           </div>
         </section>
-        {/* marque */}
+      </Container>
+      {/* marque */}
+      <Container>
         <section className="p-5">
           <Marquee className="flex bg-white rounded-lg p-0">
             <div className="mx-4 w-25 border">
@@ -262,7 +292,9 @@ const Home = () => {
             </div>
           </Marquee>
         </section>
-      </div>
+      </Container>
+
+      <div className="bg-slate-100"></div>
     </>
   );
 };

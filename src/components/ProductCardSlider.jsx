@@ -11,7 +11,7 @@ export default function App() {
     <>
       <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-1 gap-5">
         {/* */}
-        <div className="max-md:col-span-1 py-3 px-3 lg:block hidden rounded-lg bg-white scroll-smooth overflow-hidden lg:overflow-auto lg:max-h-[600px]">
+        <div className="max-md:col-span-1 py-3 px-3 lg:block hidden rounded-lg bg-white scroll-smooth overflow-hidden lg:overflow-auto lg:max-h-[570px]">
           {[...Array(7)].map((_, index) => (
             <div
               key={index}
@@ -57,22 +57,22 @@ export default function App() {
             }}
           >
             <SwiperSlide className="px-4">
-              <ProductCard />
+              <ProductCard grid={2} />
             </SwiperSlide>
             <SwiperSlide className="px-4">
-              <ProductCard />
+              <ProductCard grid={2} />
             </SwiperSlide>
             <SwiperSlide className="px-4">
-              <ProductCard />
+              <ProductCard grid={2} />
             </SwiperSlide>
             <SwiperSlide className="px-4">
-              <ProductCard />
+              <ProductCard grid={2} />
             </SwiperSlide>
             <SwiperSlide className="px-4">
-              <ProductCard />
+              <ProductCard grid={2} />
             </SwiperSlide>
             <SwiperSlide className="px-4">
-              <ProductCard />
+              <ProductCard grid={2} />
             </SwiperSlide>
           </Swiper>
         </div>

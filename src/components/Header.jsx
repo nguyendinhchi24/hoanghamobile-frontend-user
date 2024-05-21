@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 import data from "./data.json";
+import CustomInput from "./CustomInput";
 
 const products = data;
 function classNames(...classes) {
@@ -28,7 +29,7 @@ export default function Example() {
         >
           {/* logo */}
           <div className="flex lg:flex-1">
-            <Link to={"/"} className="-m-1.5 p-1.5 flex items-center">
+            <Link to="/" className="-m-1.5 p-1.5 flex items-center">
               <img
                 className="h-8 w-auto"
                 src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
@@ -43,7 +44,7 @@ export default function Example() {
           {/* inputsearch */}
           <div className="max-sm:hidden lg:flex-1 lg:justify-end items-center">
             <div className="flex max-w-[310px] pr-3 items-center space-x-2">
-              <input
+              <CustomInput
                 className="focus:outline-none flex h-[32px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-[15px] placeholder-gray-500 focus:ring-1 focus:ring-slate-900 focus:border-transparent"
                 type="search"
                 placeholder="Tìm Kiếm..."
@@ -89,7 +90,7 @@ export default function Example() {
 
             <Popover className="relative items-center">
               <Popover.Button className="flex items-center gap-x-1 text-[15px] font-semibold leading-6 hover:text-gray-800 text-black  outline-none">
-                <span className="text-black hover:text-cyan-900">Sản phẩm</span>
+                <span className="text-black hover:text-cyan-900">Danh mục</span>
                 <ChevronDownIcon
                   className="h-5 w-5 flex-none text-gray-900"
                   aria-hidden="true"
@@ -191,13 +192,13 @@ export default function Example() {
           <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
               <div className="flex lg:flex-1">
-                <Link to={"/"} className="-m-1.5 p-1.5 flex items-center">
+                <button to={"/"} className="-m-1.5 p-1.5 flex items-center">
                   <img
                     className="h-8 w-auto"
                     src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
                     alt="Logo"
                   />
-                </Link>
+                </button>
                 <span className="ml-4 text-lg font-semibold hover:text-gray-800 text-black">
                   Hoàng Hà Mobile
                 </span>
@@ -218,7 +219,7 @@ export default function Example() {
                   {/* inputsearch */}
                   <div className="max-sm:hidden lg:flex-1 lg:justify-end items-center">
                     <div className="flex max-w-[310px] pr-3 items-center space-x-2">
-                      <input
+                      <CustomInput
                         className="focus:outline-none flex h-[32px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-[15px] placeholder-gray-500 focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                         type="search"
                         placeholder="Tìm Kiếm..."

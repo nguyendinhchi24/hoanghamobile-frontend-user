@@ -10,8 +10,8 @@ import PropTypes from "prop-types";
 import { useState, useRef, useEffect } from "react";
 
 const ProductCard = (props) => {
-  const { grid } = props;
   const location = useLocation();
+  const { grid } = props;
   const [isExpanded, setIsExpanded] = useState(false);
   const [contentHeight, setContentHeight] = useState("80px");
   const contentRef = useRef(null);
@@ -42,7 +42,6 @@ const ProductCard = (props) => {
     setIsExpanded(!isExpanded);
   };
 
-  console.log(grid);
   return (
     <>
       <div
@@ -118,13 +117,13 @@ const ProductCard = (props) => {
           "
           >
             <div className="flex flex-col gap-5">
-              <Link className="hover:text-red-500 text-lg">
+              <Link to="/product/:id" className="hover:text-red-500 text-lg">
                 <FaCodeCompare />
               </Link>
-              <Link className="hover:text-red-500 text-lg">
+              <Link to="/product/:id" className="hover:text-red-500 text-lg">
                 <FaRegEye />
               </Link>
-              <Link className="hover:text-red-500 text-lg">
+              <Link to="/product/:id" className="hover:text-red-500 text-lg">
                 <FaBagShopping />
               </Link>
             </div>
@@ -136,7 +135,7 @@ const ProductCard = (props) => {
 };
 
 ProductCard.propTypes = {
-  grid: PropTypes.number.isRequired,
+  grid: PropTypes.string.isRequired,
 };
 
 export default ProductCard;

@@ -7,6 +7,7 @@ import {
   FaTiktok,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import CustomInput from "./CustomInput";
 
 const FooterComponent = () => {
   return (
@@ -24,7 +25,7 @@ const FooterComponent = () => {
             </h2>
           </div>
           <div className="flex flex-row max-sm:flex-col items-center space-y-0 space-x-2 max-sm:space-y-4 max-sm:space-x-2">
-            <input
+            <CustomInput
               className="focus:outline-none h-10 w-full max-sm:w-[260px] md:w-auto lg:w-[280px] placeholder:text-zinc-900 placeholder:opacity-50 font-mono rounded-md border border-gray-500 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:ring-1 focus:ring-slate-900 focus:border-transparent"
               type="search"
               placeholder="hoanghamobile@gmail.com"
@@ -85,19 +86,34 @@ const FooterComponent = () => {
             <div className="flex flex-col">
               <h4 className="mb-4 font-medium text-lg">Thông tin</h4>
               <div className="flex flex-col text-sm">
-                <Link className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100">
+                <Link
+                  to="/privacy-policy"
+                  className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100"
+                >
                   Chính sách bảo mật
                 </Link>
-                <Link className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100">
+                <Link
+                  to="/refund-policy"
+                  className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100"
+                >
                   Chính sách hoàn tiền
                 </Link>
-                <Link className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100">
+                <Link
+                  to="/shipping-policy"
+                  className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100"
+                >
                   Chính sách vận chuyển
                 </Link>
-                <Link className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100">
+                <Link
+                  to="/term-policy"
+                  className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100"
+                >
                   Điều khoản và điều kiện
                 </Link>
-                <Link className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100">
+                <Link
+                  to="/blog"
+                  className="py-2 mb-1 transition duration-300 opacity-70 font-medium hover:opacity-100"
+                >
                   Blogs
                 </Link>
               </div>

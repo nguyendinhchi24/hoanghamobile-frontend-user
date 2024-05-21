@@ -1,5 +1,7 @@
+import Container from "../components/Container";
+
 const About = () => {
-  return <div>About</div>;
+  return <Container>About</Container>;
 };
 
 export default About;

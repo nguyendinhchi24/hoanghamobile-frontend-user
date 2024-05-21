@@ -1,70 +1,63 @@
 import Meta from "../components/Meta";
 import BreadCrumb from "../components/BreadCrumb";
 import BlogCard from "../components/BlogCard";
+import Container from "../components/Container";
 
 const Blog = () => {
   return (
     <>
       <Meta title={"Blog"} />
       <BreadCrumb title="Blog" />
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 p-5 ">
-        {/*  */}
-        <div className="lg:col-span-1 p-5 bg-gradient-to-r from-red-500 to-pink-500 rounded-lg">
-          <div className="flex flex-col items-center justify-center ">
-            <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-                Đánh giá của bạn
-              </h2>
-
-              <form className="flex flex-col space-y-4">
-                <input
-                  type="email"
-                  className="bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
-                  placeholder="Email"
-                />
-                <input
-                  type="text"
-                  className="bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
-                  placeholder="Phone Number"
-                />
-                <textarea
-                  name="description"
-                  className="bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
-                  placeholder="Nhận xét"
-                ></textarea>
-                <input
-                  type="file"
-                  className="bg-gray-100 text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
-                />
-                <button
-                  type="submit"
-                  className="bg-gradient-to-r from-indigo-500 to-blue-500 text-white font-bold py-3 px-6 rounded-md mt-6 hover:from-indigo-600 hover:to-blue-600 transition duration-150"
+      <Container>
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-5 p-5 ">
+          {/*  */}
+          <div className="lg:col-span-1 bg-white border shadow-xl rounded-lg">
+            <ul
+              role="list"
+              className="p-6 divide-y divide-slate-200 flex flex-col gap-4"
+            >
+              {[...Array(5)].map((_, index) => (
+                <li
+                  key={index}
+                  className="flex p-4 shadow-lg rounded-lg hover:-translate-y-[10%] transition-all duration-500 bg-slate-50"
                 >
-                  Đăng bài
-                </button>
-              </form>
+                  <img
+                    className="h-10 w-10 rounded-full"
+                    src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    alt=""
+                  />
+                  <div className="ml-3 overflow-hidden">
+                    <p className="text-sm font-medium text-slate-900">
+                      chibaosoaos
+                    </p>
+                    <p className="text-sm text-slate-500 truncate">
+                      lienbasooas
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/*  */}
+          <div className="lg:col-span-3 md:col-span-2 p-5 rounded-lg bg-white border shadow-xl">
+            <div
+              className=" 
+              grid grid-cols-2 md:grid-cols-4
+              lg:grid-cols-6 xl:grid-cols-6 gap-4 "
+            >
+              <BlogCard />
+              <BlogCard />
+              <BlogCard />
+              <BlogCard />
+              <BlogCard />
+              <BlogCard />
+              <BlogCard />
+              <BlogCard />
             </div>
           </div>
         </div>
-
-        {/*  */}
-        <div className="lg:col-span-2 p-5 rounded-lg bg-gradient-to-tr from-red-500 to-pink-500">
-          <div
-            className=" 
-            grid grid-cols-2 md:grid-cols-4 
-            lg:grid-cols-6 xl:grid-cols-6 gap-4 "
-          >
-            <BlogCard />
-            <BlogCard />
-            <BlogCard />
-            <BlogCard />
-            <BlogCard />
-            <BlogCard />
-            <BlogCard />
-            <BlogCard />
-          </div>
-        </div>
-      </div>
+      </Container>
     </>
   );
 };
