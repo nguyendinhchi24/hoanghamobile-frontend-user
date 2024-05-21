@@ -56,14 +56,16 @@ const Cart = () => {
                   <TableCell align="right">100.000 VNĐ</TableCell>
 
                   <TableCell align="right">
-                    <CustomInput
-                      type="number"
-                      defaultValue={2}
-                      className="w-12 text-center bg-gray-100 rounded-md p-1 text-sm border"
-                    />
-                    <button className="ml-4 text-red-600 hover:text-red-800 transition duration-300">
-                      <DeleteForeverRoundedIcon />
-                    </button>
+                    <div className="flex items-center justify-end">
+                      <CustomInput
+                        type="number"
+                        defaultValue={2}
+                        className="w-12 text-center bg-gray-100 rounded-md p-1 text-sm border"
+                      />
+                      <button className="ml-4 text-red-600 hover:text-red-800 transition duration-300">
+                        <DeleteForeverRoundedIcon />
+                      </button>
+                    </div>
                   </TableCell>
                   <TableCell align="right">200.000 VNĐ</TableCell>
                 </TableRow>

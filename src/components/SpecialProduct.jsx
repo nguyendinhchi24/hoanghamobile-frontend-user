@@ -80,7 +80,10 @@ const SpecialProduct = () => {
               </div>
             </div>
 
-            <Link className="shadow-md flex items-center group-hover:gap-2 bg-gradient-to-br from-lime-200 to-yellow-200 p-3 rounded-full cursor-pointer duration-300">
+            <Link
+              to="/cart"
+              className="shadow-md flex items-center group-hover:gap-2 bg-gradient-to-br from-lime-200 to-yellow-200 p-3 rounded-full cursor-pointer duration-300"
+            >
               <FaBagShopping className="text-xl" />
               <span className="text-[0px] group-hover:text-sm duration-150">
                 Mua ngay

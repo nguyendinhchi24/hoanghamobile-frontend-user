@@ -46,10 +46,19 @@ const ProductCard = (props) => {
     <>
       <div
         className={`${
-          location.pathname === "/store" ? `col-span-${grid}` : "col-span-2"
+          location.pathname === "/product" ? `col-span-${grid}` : "col-span-2"
         }`}
       >
-        <div className="group relative select-none border-2 shadow shadow-red-400 bg-white rounded-lg">
+        <Link
+          to={`${
+            location.pathname !== "/"
+              ? "/product/:id"
+              : location.pathname == "/product/:id"
+              ? "/product/:id"
+              : ":id"
+          }`}
+          className="group relative select-none border-2 shadow shadow-red-400 bg-white rounded-lg"
+        >
           {/* like */}
           <div className="absolute z-8 top-4 text-lg right-1 cursor-pointer">
             <Checkbox
@@ -128,7 +137,7 @@ const ProductCard = (props) => {
               </Link>
             </div>
           </div>
-        </div>
+        </Link>
       </div>
     </>
   );

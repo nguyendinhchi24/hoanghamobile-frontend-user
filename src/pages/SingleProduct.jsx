@@ -19,9 +19,10 @@ import MoneyOffIcon from "@mui/icons-material/MoneyOff";
 import ElectricRickshawIcon from "@mui/icons-material/ElectricRickshaw";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
+import ProductCard from "../components/ProductCard";
 
 const SingleProduct = () => {
-  const [orderedProduct, setorderedProduct] = useState(false);
+  const [orderedProduct, setorderedProduct] = useState(true);
   const slides = [
     {
       src: images.product.anh1,
@@ -64,11 +65,11 @@ const SingleProduct = () => {
       <BreadCrumb title="Product name" />
       {/*  */}
       <Container>
-        <section className="container mx-auto p-5 space-y-8">
-          <div className="grid grid-cols-12 gap-6">
+        <section className="mx-auto p-5 space-y-8">
+          <div className="grid lg:grid-cols-12 gap-6">
             {/* Slider  */}
-            <div className="col-span-6 bg-red-50 pt-8 shadow-lg rounded-lg">
-              <div className="w-full px-10">
+            <div className="lg:col-span-6 pt-8 shadow-2xl ring-2 ring-gray-500 rounded-lg flex flex-col items-center justify-center ">
+              <div className="lg:w-full w-80 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
                 <Slider
                   {...sliderSettings}
                   ref={sliderRef}
@@ -79,7 +80,7 @@ const SingleProduct = () => {
                 >
                   {slides.map((slide, index) => (
                     <div key={index}>
-                      <figure className="flex items-center py-2 justify-center overflow-hidden">
+                      <figure className="flex items-center justify-center overflow-hidden">
                         <img
                           src={slide.src}
                           alt=""
@@ -90,7 +91,8 @@ const SingleProduct = () => {
                   ))}
                 </Slider>
               </div>
-              <div className="flex justify-start lg:py-11 lg:px-16 gap-5 bg-red-50 rounded-lg">
+
+              <div className="flex justify-start lg:py-11 lg:px-16 gap-5 py-10 rounded-lg">
                 {slides.map((slide, index) => (
                   <img
                     key={index}
@@ -106,7 +108,7 @@ const SingleProduct = () => {
             </div>
 
             {/* Product Details  */}
-            <div className="col-span-6 bg-white p-8 shadow-lg rounded-lg">
+            <div className="lg:col-span-6  p-8 shadow-lg rounded-lg">
               {/*  */}
               <div className="space-y-6">
                 <div className="space-y-1">
@@ -167,7 +169,7 @@ const SingleProduct = () => {
                       <CustomInput
                         type="number"
                         defaultValue={1}
-                        className="w-24 p-1 border rounded"
+                        className="w-14 p-1 border rounded"
                       />
                     </div>
                     <div className="flex space-x-4 items-center">
@@ -187,7 +189,10 @@ const SingleProduct = () => {
                   </div>
 
                   <div className="flex items-center space-x-6 mt-6">
-                    <button className="flex items-center space-x-2  hover:text-red-500 transition duration-300 ease-in-out">
+                    <Link
+                      to="/wishlist"
+                      className="flex items-center space-x-2  hover:text-red-500 transition duration-300 ease-in-out"
+                    >
                       <Checkbox
                         icon={<FavoriteBorder />}
                         checkedIcon={<Favorite className="text-red-500" />}
@@ -195,13 +200,16 @@ const SingleProduct = () => {
                       <p className="text-gray-500 hover:text-red-500 font-medium transition duration-300 ease-in-out">
                         Add to Wishlist
                       </p>
-                    </button>
-                    <button className="flex items-center space-x-2  hover:text-gray-700 transition duration-300 ease-in-out">
+                    </Link>
+                    <Link
+                      to="/compare-product"
+                      className="flex items-center space-x-2  hover:text-gray-700 transition duration-300 ease-in-out"
+                    >
                       <FaCodeCompare className="text-gray-500" />
                       <p className="text-gray-500 hover:text-gray-700 font-medium transition duration-300 ease-in-out">
                         Add to Compare
                       </p>
-                    </button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -415,41 +423,25 @@ const SingleProduct = () => {
       </Container>
       {/*  */}
       <Container>
-        <section className="p-5">
-          <div className="relative grid grid-cols-1 lg:grid-cols-4 gap-4">
-            {/* Sản phẩm 1 */}
-            {[...Array(4)].map((_, index) => (
-              <button
-                to="/store"
-                key={index}
-                className="relative bg-white hover:bg-slate-200 rounded-lg shadow-lg overflow-hidden lg:col-span-1"
-              >
-                <img
-                  src={images.product.watch}
-                  className="object-cover w-full h-40 lg:h-auto"
-                  alt="Samsung Galaxy S24 Ultra"
-                />
-                <div className="p-4">
-                  <p className="text-sm font-medium text-gray-600">Giảm giá</p>
-                  <h2 className="text-lg lg:text-2xl font-semibold transition duration-500 text-gray-800 py-3">
-                    Galaxy S24 Ultra
-                  </h2>
-                  <Rating readOnly defaultValue={4} size="small" />
-
-                  <p className="text-base font-semibold text-red-500">
-                    Giá chỉ còn 14.000.000 <sup className="text-sm">đ</sup>
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Giảm 10% cho học sinh - sinh viên
-                  </p>
-                </div>
-                <div className="absolute top-3 right-2 animate-bounce bg-red-500 px-5 py-3 rounded-lg">
-                  <p className="text-sm font-semibold text-white">Trả góp 0%</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </section>
+        <Container>
+          <section className="p-5">
+            <h3 className="text-2xl p-4 text-slate-900 font-semibold">
+              Bộ sửu tập
+            </h3>
+            <div
+              className="bg-white rounded-lg p-4
+            grid grid-cols-1 md:grid-cols-4
+            lg:grid-cols-8 xl:grid-cols-12 gap-4"
+            >
+              <ProductCard grid={2} />
+              <ProductCard grid={2} />
+              <ProductCard grid={2} />
+              <ProductCard grid={2} />
+              <ProductCard grid={2} />
+              <ProductCard grid={2} />
+            </div>
+          </section>
+        </Container>
       </Container>
     </>
   );

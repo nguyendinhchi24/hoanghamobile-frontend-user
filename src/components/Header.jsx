@@ -270,6 +270,18 @@ export default function Example() {
                       </>
                     )}
                   </Disclosure>
+                  <Link
+                    to={"/"}
+                    className="-mx-3 outline-none block rounded-lg px-3 py-2 text-[15px] font-semibold leading-7 text-black hover:bg-gray-200"
+                  >
+                    <span>Liên hệ</span>
+                  </Link>
+                  <Link
+                    to={"/"}
+                    className="-mx-3 outline-none block rounded-lg px-3 py-2 text-[15px] font-semibold leading-7 text-black hover:bg-gray-200"
+                  >
+                    <span>Đăng nhập</span>
+                  </Link>
                 </div>
 
                 <div className="py-6 flex justify-between">

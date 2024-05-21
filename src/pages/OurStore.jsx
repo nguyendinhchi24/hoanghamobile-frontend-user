@@ -87,7 +87,7 @@ function classNames(...classes) {
 
 const OurStore = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [grid, setGrid] = useState(4);
+  const [grid, setGrid] = useState(3);
   const [checkedColor, setCheckedColor] = useState({
     black: false,
     white: false,
