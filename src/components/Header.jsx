@@ -17,7 +17,11 @@ function classNames(...classes) {
 
 export default function Example() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
+  const handleItemClick = () => {
+    setIsOpen(false);
+  };
   return (
     <>
       <header
@@ -89,7 +93,10 @@ export default function Example() {
             </Link>
 
             <Popover className="relative items-center">
-              <Popover.Button className="flex items-center gap-x-1 text-[15px] font-semibold leading-6 hover:text-gray-800 text-black  outline-none">
+              <Popover.Button
+                className="flex items-center gap-x-1 text-[15px] font-semibold leading-6 hover:text-gray-800 text-black outline-none"
+                onClick={() => setIsOpen(!isOpen)}
+              >
                 <span className="text-black hover:text-cyan-900">Danh mục</span>
                 <ChevronDownIcon
                   className="h-5 w-5 flex-none text-gray-900"
@@ -99,6 +106,7 @@ export default function Example() {
 
               <Transition
                 as={Fragment}
+                show={isOpen}
                 enter="transition ease-out duration-200"
                 enterFrom="opacity-0 translate-y-1"
                 enterTo="opacity-100 translate-y-0"
@@ -114,6 +122,7 @@ export default function Example() {
                         to={item.href}
                         href={item.href}
                         className="group relative flex items-center gap-x-6 rounded-lg p-3 text-sm leading-4 hover:bg-gray-200 cursor-pointer"
+                        onClick={handleItemClick}
                       >
                         <div className="flex-auto">
                           <div className="block font-semibold hover:text-gray-800 text-black">

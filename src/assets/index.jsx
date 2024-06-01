@@ -11,6 +11,7 @@ import watch from "./images/watch.jpg";
 import anh1 from "./images/anh1.webp";
 import anh2 from "./images/anh2.webp";
 import anh3 from "./images/anh3.webp";
+import anh4 from "./images/product/anhdt.png";
 
 const images = {
   brand: {
@@ -31,6 +32,7 @@ const images = {
     anh1: anh1,
     anh2: anh2,
     anh3: anh3,
+    anh4: anh4,
   },
 };
 

@@ -1,11 +1,23 @@
 import PropTypes from "prop-types";
 
-const CustomInput = ({ type, name, placeholder, className, ...rest }) => {
+const CustomInput = ({
+  type,
+  name,
+  placeholder,
+  className,
+  onChange,
+  onBlur,
+  value,
+  ...rest
+}) => {
   return (
     <div>
       <input
         placeholder={placeholder}
         className={className}
+        onChange={onChange}
+        onBlur={onBlur}
+        value={value}
         name={name}
         type={type}
         {...rest}
@@ -19,6 +31,9 @@ CustomInput.propTypes = {
   name: PropTypes.string,
   placeholder: PropTypes.string,
   className: PropTypes.string,
+  onChange: PropTypes.func,
+  onBlur: PropTypes.func,
+  value: PropTypes.string,
 };
 
 export default CustomInput;

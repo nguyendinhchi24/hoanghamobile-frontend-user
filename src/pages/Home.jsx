@@ -3,7 +3,6 @@ import Marquee from "react-fast-marquee";
 import BlogCard from "../components/BlogCard";
 import category from "./anh1.png";
 import images from "../assets";
-import ProductCard from "../components/ProductCard";
 import SpecialProduct from "../components/SpecialProduct";
 import ProductCardSlider from "../components/ProductCardSlider";
 import { Rating } from "@mui/material";
@@ -15,6 +14,12 @@ import {
   FaMoneyBillWave,
 } from "react-icons/fa";
 import services from "../utils/Data";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getAllBlogs } from "../features/blogs/blogSlice";
+import moment from "moment";
+import ProductList from "../components/ProductList";
+import { getAllProducts } from "../features/products/productSlice";
 
 const iconMap = {
   FaShippingFast: FaShippingFast,
@@ -24,6 +29,17 @@ const iconMap = {
 };
 
 const Home = () => {
+  const dispatch = useDispatch();
+  const blogState = useSelector((state) => state.blog.blogs);
+  const productState = useSelector((state) => state.product.products);
+
+  console.log(productState);
+
+  useEffect(() => {
+    dispatch(getAllBlogs());
+    dispatch(getAllProducts());
+  }, [dispatch]);
+
   return (
     <>
       {/* slider */}
@@ -132,6 +148,7 @@ const Home = () => {
           </div>
         </section>
       </Container>
+
       {/* special */}
       <Container>
         <section className="p-5">
@@ -144,15 +161,17 @@ const Home = () => {
             sm:grid-cols-2 md:grid-cols-2 
             lg:grid-cols-2 xl:grid-cols-3 gap-4"
           >
-            <SpecialProduct />
-            <SpecialProduct />
-            <SpecialProduct />
+            <SpecialProduct data={productState ? productState : []} />
           </div>
         </section>
       </Container>
+
       {/*  */}
       <Container>
         <section className="p-5">
+          <h3 className="text-2xl p-4 text-slate-900 font-semibold">
+            Sản phẩm
+          </h3>
           <div className="relative grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Sản phẩm 1 */}
             {[...Array(4)].map((_, index) => (
@@ -188,6 +207,7 @@ const Home = () => {
           </div>
         </section>
       </Container>
+
       {/* featured */}
       <Container>
         <section className="p-5">
@@ -199,16 +219,12 @@ const Home = () => {
             grid grid-cols-1 md:grid-cols-4
             lg:grid-cols-8 xl:grid-cols-12 gap-4"
           >
-            <ProductCard grid={2} />
-            <ProductCard grid={2} />
-            <ProductCard grid={2} />
-            <ProductCard grid={2} />
-            <ProductCard grid={2} />
-            <ProductCard grid={2} />
+            <ProductList grid={2} number={6} />
           </div>
         </section>
       </Container>
       {/* pupup */}
+
       <Container>
         <section className="p-5">
           <h3 className="text-2xl p-4 text-slate-900 font-semibold">
@@ -255,10 +271,23 @@ const Home = () => {
             grid grid-cols-2 md:grid-cols-4 
             lg:grid-cols-6 xl:grid-cols-8 gap-4"
           >
-            <BlogCard />
-            <BlogCard />
-            <BlogCard />
-            <BlogCard />
+            {blogState &&
+              blogState?.map((item, index) => {
+                if (index < 4) {
+                  return (
+                    <BlogCard
+                      key={index}
+                      id={item?._id}
+                      title={item?.title}
+                      description={item?.description}
+                      image={item?.images[0]?.url}
+                      date={moment(item?.created_at).format(
+                        "MMMM Do YYYY, h:mm:ss a"
+                      )}
+                    />
+                  );
+                }
+              })}
           </div>
         </section>
       </Container>

@@ -3,7 +3,31 @@ import BreadCrumb from "../components/BreadCrumb";
 import Container from "../components/Container";
 import { Link } from "react-router-dom";
 import CustomInput from "../components/CustomInput";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { loginUser } from "../features/user/userSlice";
+
+let loginSchema = Yup.object({
+  email: Yup.string()
+    .required("Email Không được để trống")
+    .email("Email Không đúng"),
+  password: Yup.string().required("Mật khẩu Không được để trống"),
+});
+
 const Login = () => {
+  const dispatch = useDispatch();
+
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+    },
+    validationSchema: loginSchema,
+    onSubmit: (values) => {
+      dispatch(loginUser(values));
+    },
+  });
   return (
     <>
       <Meta title={"Login List"} />
@@ -18,15 +42,33 @@ const Login = () => {
             </p>
           </div>
 
-          <form className="mx-auto mb-0 mt-8 max-w-md space-y-4" action="#">
+          <form
+            onSubmit={formik.handleSubmit}
+            className="mx-auto mb-0 mt-8 max-w-md space-y-4"
+          >
             <div>
-              <label className="sr-only">Email</label>
+              <div className="flex justify-between">
+                <label
+                  className="font-semibold text-sm text-gray-600 pb-1 block"
+                  htmlFor="login"
+                >
+                  Email
+                </label>
+                <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                  {formik.touched.email && formik.errors.email ? (
+                    <div>{formik.errors.email}</div>
+                  ) : null}
+                </div>
+              </div>
               <div className="relative">
                 <CustomInput
                   placeholder="Enter your email"
                   className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
                   id="email"
                   type="email"
+                  onChange={formik.handleChange("email")}
+                  onBlur={formik.handleBlur("email")}
+                  value={formik.values.email}
                 />
                 <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
                   <svg
@@ -48,13 +90,28 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="sr-only">Password</label>
+              <div className="flex justify-between">
+                <label
+                  className="font-semibold text-sm text-gray-600 pb-1 block"
+                  htmlFor="login"
+                >
+                  Password
+                </label>
+                <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                  {formik.touched.password && formik.errors.password ? (
+                    <div>{formik.errors.password}</div>
+                  ) : null}
+                </div>
+              </div>
               <div className="relative">
                 <CustomInput
                   placeholder="Enter your password"
                   className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                  id="password"
+                  name="password"
                   type="password"
+                  onChange={formik.handleChange("password")}
+                  onBlur={formik.handleBlur("password")}
+                  value={formik.values.password}
                 />
                 <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
                   <svg
@@ -102,15 +159,12 @@ const Login = () => {
               <p className="text-sm text-gray-600">
                 No account yet?&nbsp;
                 <Link to="/register" className="underline">
-                  Create one
+                  Register
                 </Link>
               </p>
-              <Link
-                to="/"
-                className="inline-block rounded-lg bg-purple-600 px-5 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              >
+              <button className="inline-block rounded-lg bg-purple-600 px-5 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                 Sign In
-              </Link>
+              </button>
             </div>
           </form>
         </div>

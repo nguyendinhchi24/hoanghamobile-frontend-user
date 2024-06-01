@@ -1,11 +1,12 @@
 import Meta from "../components/Meta";
 import BreadCrumb from "../components/BreadCrumb";
 import images from "../assets";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Checkbox, Rating } from "@mui/material";
 import { useRef, useState } from "react";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import { FaCodeCompare } from "react-icons/fa6";
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -19,45 +20,66 @@ import MoneyOffIcon from "@mui/icons-material/MoneyOff";
 import ElectricRickshawIcon from "@mui/icons-material/ElectricRickshaw";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
-import ProductCard from "../components/ProductCard";
+import ProductList from "./../components/ProductList";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getAProduct } from "../features/products/productSlice";
+import { toast } from "react-toastify";
+
+const slides = [
+  {
+    src: images.product.anh1,
+  },
+  {
+    src: images.product.anh2,
+  },
+  {
+    src: images.product.anh3,
+  },
+  {
+    src: images.product.watch,
+  },
+];
+
+const sliderSettings = {
+  dots: true,
+  infinite: true,
+  speed: 500,
+  slidesToShow: 1,
+  slidesToScroll: 1,
+  arrows: true,
+};
 
 const SingleProduct = () => {
   const [orderedProduct, setorderedProduct] = useState(true);
-  const slides = [
-    {
-      src: images.product.anh1,
-    },
-    {
-      src: images.product.anh2,
-    },
-    {
-      src: images.product.anh3,
-    },
-    {
-      src: images.product.watch,
-    },
-  ];
   const [selectedSlide, setSelectedSlide] = useState(0);
+  const [expanded, setExpanded] = useState(false);
   const sliderRef = useRef();
+  const location = useLocation();
+  const getProductId = location.pathname.split("/")[2];
+  const productState = useSelector((state) => state.product.singleProduct);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getAProduct(getProductId));
+  }, [dispatch]);
 
   const handleThumbnailClick = (index) => {
     setSelectedSlide(index);
     sliderRef.current.slickGoTo(index);
   };
-  const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    arrows: true,
-  };
-
-  // according
-  const [expanded, setExpanded] = useState(false);
 
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(isExpanded ? panel : false);
+  };
+
+  const copyToClipboard = (panel) => {
+    var textField = document.createElement("textarea");
+    textField.innerHTML = panel;
+    document.body.appendChild(textField);
+    textField.select();
+    document.execCommand("copy");
+    textField.remove();
+    toast.success("Copy thành công!");
   };
   return (
     <>
@@ -112,14 +134,19 @@ const SingleProduct = () => {
               {/*  */}
               <div className="space-y-6">
                 <div className="space-y-1">
-                  <h3 className="text-3xl font-bold">Iphone 14 Pro Max</h3>
+                  <h3 className="text-3xl font-bold">{productState?.title}</h3>
                   <h3 className="text-xl text-red-600 font-bold pt-3 px-3 underline">
-                    15.000.000 VNĐ
+                    {productState?.price} VNĐ
                   </h3>
                 </div>
-                <div className="text-gray-500 space-y-2">
+                <div className="flex items-center justify-between text-gray-500 ">
                   <div className="flex items-center space-x-3">
-                    <Rating defaultValue={4} size="small" />
+                    <Rating
+                      name="size-small"
+                      readOnly
+                      value={parseInt(productState?.totalrating)}
+                      size="small"
+                    />
                     <p className="text-sm font-medium">(20 reviews)</p>
                   </div>
                   <a
@@ -137,15 +164,15 @@ const SingleProduct = () => {
                   </div>
                   <div className="flex items-center">
                     <h3 className="w-28 font-medium">Brand:</h3>
-                    <p>Havells</p>
+                    <p>{productState?.brand}</p>
                   </div>
                   <div className="flex items-center">
                     <h3 className="w-28 font-medium">Categories:</h3>
-                    <p>Electronics, Accessories</p>
+                    <p>{productState?.category}</p>
                   </div>
                   <div className="flex items-center">
                     <h3 className="w-28 font-medium">Tags:</h3>
-                    <p>oppo, xiaomi, iphone, samsung</p>
+                    <p>{productState?.tags}</p>
                   </div>
                   <div className="flex items-center">
                     <h3 className="w-28 font-medium">SKU:</h3>
@@ -158,8 +185,25 @@ const SingleProduct = () => {
                   <div className="flex items-center">
                     <h3 className="w-28 font-medium">Color:</h3>
                     <div className="flex items-center space-x-2">
-                      <div className="text-gray-500">Black</div>
-                      <div className="w-6 h-6 bg-black rounded-full"></div>
+                      <div className="flex items-center space-x-2">
+                        <div className="text-gray-500">
+                          {productState?.color[0]}
+                        </div>
+                        <div
+                          className={`w-6 h-6 bg-${productState?.color[0].toLowerCase()} rounded-full`}
+                        ></div>
+                      </div>
+                      {/* {productState?.color.map((color, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center space-x-2"
+                        >
+                          <div className="text-gray-500">{color}</div>
+                          <div
+                            className={`w-6 h-6 border border-gray-500 bg-${color.toLowerCase()} rounded-full`}
+                          ></div>
+                        </div>
+                      ))} */}
                     </div>
                   </div>
 
@@ -188,11 +232,8 @@ const SingleProduct = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center space-x-6 mt-6">
-                    <Link
-                      to="/wishlist"
-                      className="flex items-center space-x-2  hover:text-red-500 transition duration-300 ease-in-out"
-                    >
+                  <div className="flex items-center space-x-6 py-3">
+                    <button className="flex items-center space-x-2  hover:text-red-500 transition duration-300 ease-in-out">
                       <Checkbox
                         icon={<FavoriteBorder />}
                         checkedIcon={<Favorite className="text-red-500" />}
@@ -200,16 +241,28 @@ const SingleProduct = () => {
                       <p className="text-gray-500 hover:text-red-500 font-medium transition duration-300 ease-in-out">
                         Add to Wishlist
                       </p>
-                    </Link>
-                    <Link
-                      to="/compare-product"
-                      className="flex items-center space-x-2  hover:text-gray-700 transition duration-300 ease-in-out"
-                    >
+                    </button>
+                    <button className="flex items-center space-x-2  hover:text-gray-700 transition duration-300 ease-in-out">
                       <FaCodeCompare className="text-gray-500" />
                       <p className="text-gray-500 hover:text-gray-700 font-medium transition duration-300 ease-in-out">
                         Add to Compare
                       </p>
-                    </Link>
+                    </button>
+                    <div className="flex items-center space-x-2  hover:text-gray-700 transition duration-300 ease-in-out">
+                      <p className="text-gray-500 hover:text-gray-700 font-medium transition duration-300 ease-in-out">
+                        Product Link:
+                      </p>
+                      <a
+                        href="javascript:void(0);"
+                        onClick={() => {
+                          copyToClipboard(window.location.href);
+                        }}
+                        className="text-gray-500 hover:text-gray-800 flex items-center gap-2"
+                      >
+                        <ContentCopyOutlinedIcon fontSize="small" />
+                        <p>Copy Product Link</p>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -293,18 +346,12 @@ const SingleProduct = () => {
             </h4>
             <div className="col-span-12 rounded-lg shadow-lg">
               <div className="bg-white p-6 rounded-lg shadow-inner">
-                <p className="text-gray-700 px-5 indent-5">
-                  Lorem Ipsum is simply dummy text of the printing and
-                  typesetting industry. Lorem Ipsum has been the industrys
-                  standard dummy text ever since the 1500s, when an unknown
-                  printer took a galley of type and scrambled it to make a type
-                  specimen book. It has survived not only five centuries, but
-                  also the leap into electronic typesetting, remaining
-                  essentially unchanged. It was popularised in the 1960s with
-                  the release of Letraset sheets containing Lorem Ipsum
-                  passages, and more recently with desktop publishing software
-                  like Aldus PageMaker including versions of Lorem Ipsum.
-                </p>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: productState?.description.substr(0, 70) + "...",
+                  }}
+                  className="text-gray-700 px-5 indent-5"
+                ></p>
               </div>
             </div>
           </div>
@@ -423,25 +470,18 @@ const SingleProduct = () => {
       </Container>
       {/*  */}
       <Container>
-        <Container>
-          <section className="p-5">
-            <h3 className="text-2xl p-4 text-slate-900 font-semibold">
-              Bộ sửu tập
-            </h3>
-            <div
-              className="bg-white rounded-lg p-4
+        <section className="p-5">
+          <h3 className="text-2xl p-4 text-slate-900 font-semibold">
+            Bộ sửu tập
+          </h3>
+          <div
+            className="bg-white rounded-lg p-4
             grid grid-cols-1 md:grid-cols-4
             lg:grid-cols-8 xl:grid-cols-12 gap-4"
-            >
-              <ProductCard grid={2} />
-              <ProductCard grid={2} />
-              <ProductCard grid={2} />
-              <ProductCard grid={2} />
-              <ProductCard grid={2} />
-              <ProductCard grid={2} />
-            </div>
-          </section>
-        </Container>
+          >
+            <ProductList grid={2} number={6} />
+          </div>
+        </section>
       </Container>
     </>
   );

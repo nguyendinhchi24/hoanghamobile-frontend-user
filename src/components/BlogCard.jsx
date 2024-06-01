@@ -1,38 +1,49 @@
 import images from "../assets";
 import { Link } from "react-router-dom";
+import { PropTypes } from "prop-types";
 
-const BlogCard = () => {
+const BlogCard = ({ id, title, description, image, date }) => {
   return (
-    <>
-      <div className="col-span-2">
-        <div className="p-1 border-2 ring-black shadow-lg ring-1 rounded-lg bg-white">
-          <div className="rounded-lg flex justify-center items-center ">
-            <img
-              src={images.blog.card}
-              alt=""
-              className="rounded-lg object-cover w-full h-full"
-            />
-          </div>
-          <div className="px-2 py-3">
-            <p className="opacity-80 py-2 px-4">1 / 2024</p>
-            <h5 className="font-semibold text-xl">Rất tuyệt vời hahahahahha</h5>
-            <p className="text-sm py-2 indent-4">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            </p>
-            <div className="text-right py-1">
-              <Link
-                to="/blog/:id"
-                className="bg-slate-900 py-2 px-6 rounded-md text-white text-sm opacity-80 hover:opacity-100 transition duration-300"
-              >
-                Read More
-              </Link>
-            </div>
+    <div className="col-span-2">
+      <div className="border rounded-lg overflow-hidden bg-slate-100 shadow-xl ring-1 ring-gray-800">
+        <div className="rounded-lg">
+          <img
+            src={image ? image : images.blog.card}
+            alt=""
+            className="rounded-t-lg object-cover w-full h-48 md:h-64"
+          />
+        </div>
+        <div className="p-4">
+          <p className="text-gray-500 text-sm mb-2">{date}</p>
+          <h3 className="text-xl font-semibold mb-2 overflow-hidden whitespace-nowrap overflow-ellipsis">
+            {title}
+          </h3>
+          <p
+            dangerouslySetInnerHTML={{
+              __html: description.substr(0, 70) + "...",
+            }}
+            className="text-sm mb-4 overflow-hidden whitespace-nowrap overflow-ellipsis"
+          ></p>
+          <div className="text-right">
+            <Link
+              to={"/blog/" + id}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300"
+            >
+              Read More
+            </Link>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
+};
+
+BlogCard.propTypes = {
+  id: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+  image: PropTypes.string,
+  date: PropTypes.string.isRequired,
 };
 
 export default BlogCard;

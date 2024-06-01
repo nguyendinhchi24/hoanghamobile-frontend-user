@@ -5,8 +5,35 @@ import { FaHourglassHalf, FaPhoneVolume } from "react-icons/fa";
 import { IoMdMail } from "react-icons/io";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { createQuery } from "../features/contact/contactSlice";
+
+let contactSchema = Yup.object({
+  name: Yup.string().required("Name không được để trống"),
+  email: Yup.string()
+    .required("Email không được để trống")
+    .email("Email không hợp lệ"),
+  phone: Yup.number().required("Số điện thoại không được để trống"),
+  comment: Yup.string().required("Comment không được để trống"),
+});
 
 const Contact = () => {
+  const dispatch = useDispatch();
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      phone: "",
+      comment: "",
+    },
+    validationSchema: contactSchema,
+    onSubmit: (values) => {
+      dispatch(createQuery(values));
+    },
+  });
   return (
     <>
       <Meta title={"Contact"} />
@@ -32,27 +59,102 @@ const Contact = () => {
                   Contact
                 </h2>
 
-                <form className="flex flex-col space-y-4">
-                  <CustomInput
-                    type="text"
-                    className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
-                    placeholder="Name"
-                  />
-                  <CustomInput
-                    type="email"
-                    className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
-                    placeholder="Email"
-                  />
-                  <CustomInput
-                    type="text"
-                    className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
-                    placeholder="Phone Number"
-                  />
-                  <textarea
-                    name="description"
-                    className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
-                    placeholder="Nhận xét"
-                  ></textarea>
+                <form
+                  onSubmit={formik.handleSubmit}
+                  className="flex flex-col space-y-4"
+                >
+                  <div>
+                    <div className="flex justify-between">
+                      <label
+                        className="font-semibold text-sm text-gray-600 pb-1 block"
+                        htmlFor="name"
+                      >
+                        Name
+                      </label>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.name && formik.errors.name ? (
+                          <div>{formik.errors.name}</div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <CustomInput
+                      type="text"
+                      className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
+                      placeholder="Name"
+                      onChange={formik.handleChange("name")}
+                      onBlur={formik.handleBlur("name")}
+                      value={formik.values.name}
+                    />
+                  </div>
+                  <div>
+                    <div className="flex justify-between">
+                      <label
+                        className="font-semibold text-sm text-gray-600 pb-1 block"
+                        htmlFor="email"
+                      >
+                        Email
+                      </label>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.email && formik.errors.email ? (
+                          <div>{formik.errors.email}</div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <CustomInput
+                      type="email"
+                      className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
+                      placeholder="Email"
+                      onChange={formik.handleChange("email")}
+                      onBlur={formik.handleBlur("email")}
+                      value={formik.values.email}
+                    />
+                  </div>
+                  <div>
+                    <div className="flex justify-between">
+                      <label
+                        className="font-semibold text-sm text-gray-600 pb-1 block"
+                        htmlFor="phone"
+                      >
+                        Phone
+                      </label>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.phone && formik.errors.phone ? (
+                          <div>{formik.errors.phone}</div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <CustomInput
+                      type="tel"
+                      className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
+                      placeholder="Phone Number"
+                      onChange={formik.handleChange("phone")}
+                      onBlur={formik.handleBlur("phone")}
+                      value={formik.values.phone}
+                    />
+                  </div>
+                  <div>
+                    <div className="flex justify-between">
+                      <label
+                        className="font-semibold text-sm text-gray-600 pb-1 block"
+                        htmlFor="comment"
+                      >
+                        Comment
+                      </label>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.comment && formik.errors.comment ? (
+                          <div>{formik.errors.comment}</div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <textarea
+                      name="comment"
+                      className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-150"
+                      placeholder="Nhận xét"
+                      onChange={formik.handleChange("comment")}
+                      onBlur={formik.handleBlur("comment")}
+                      value={formik.values.comment}
+                    ></textarea>
+                  </div>
 
                   <button
                     type="submit"

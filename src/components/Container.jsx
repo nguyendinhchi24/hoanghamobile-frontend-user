@@ -1,4 +1,4 @@
-import { PropTypes } from "prop-types";
+import PropTypes from "prop-types";
 
 const Container = (props) => {
   return (
@@ -10,7 +10,7 @@ const Container = (props) => {
 
 Container.propTypes = {
   class: PropTypes.string,
-  children: PropTypes.string,
+  children: PropTypes.node,
 };
 
 export default Container;

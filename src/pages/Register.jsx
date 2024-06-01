@@ -1,16 +1,44 @@
 import Meta from "../components/Meta";
 import BreadCrumb from "../components/BreadCrumb";
-import { Link } from "react-router-dom";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { registerUser } from "../features/user/userSlice";
+import { Link } from "react-router-dom";
+
+let registerSchema = Yup.object({
+  name: Yup.string().required("Name Không được để trống"),
+  email: Yup.string()
+    .required("Email Không được để trống")
+    .email("Email Không đúng"),
+  phone: Yup.number().required("Phone Không được để trống"),
+  password: Yup.string().required("Mật khẩu Không được để trống"),
+});
 
 const Register = () => {
+  const dispatch = useDispatch();
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      phone: "",
+      password: "",
+    },
+    validationSchema: registerSchema,
+    onSubmit: (values) => {
+      dispatch(registerUser(values));
+    },
+  });
+
   return (
     <>
       <Meta title={"Register List"} />
       <BreadCrumb title="Register List" />
       <Container>
-        <div className="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-xl px-4 pb-16 pt-5 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-lg text-center">
             <h1 className="text-2xl font-bold sm:text-3xl">Register</h1>
             <p className="mt-4 text-gray-600">
@@ -19,15 +47,34 @@ const Register = () => {
             </p>
           </div>
 
-          <form className="mx-auto mb-0 mt-8 max-w-md space-y-4" action="#">
+          <form
+            onSubmit={formik.handleSubmit}
+            className="mx-auto mb-0 mt-8 max-w-md space-y-4"
+            action="#"
+          >
             <div>
-              <label className="sr-only">Name</label>
+              <div className="flex justify-between">
+                <label
+                  className="font-semibold text-sm text-gray-600 pb-1 block"
+                  htmlFor="register"
+                >
+                  Name
+                </label>
+                <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                  {formik.touched.name && formik.errors.name ? (
+                    <div>{formik.errors.name}</div>
+                  ) : null}
+                </div>
+              </div>
               <div className="relative">
                 <CustomInput
-                  placeholder="Enter your full name"
+                  placeholder="Enter your name"
                   className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                  id="name"
+                  name="name"
                   type="text"
+                  onChange={formik.handleChange("name")}
+                  onBlur={formik.handleBlur("name")}
+                  value={formik.values.name}
                 />
 
                 <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
@@ -48,14 +95,30 @@ const Register = () => {
                 </span>
               </div>
             </div>
+
             <div>
-              <label className="sr-only">Email</label>
+              <div className="flex justify-between">
+                <label
+                  className="font-semibold text-sm text-gray-600 pb-1 block"
+                  htmlFor="register"
+                >
+                  Email
+                </label>
+                <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                  {formik.touched.email && formik.errors.email ? (
+                    <div>{formik.errors.email}</div>
+                  ) : null}
+                </div>
+              </div>
               <div className="relative">
                 <CustomInput
                   placeholder="Enter your email"
                   className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
                   id="email"
                   type="email"
+                  onChange={formik.handleChange("email")}
+                  onBlur={formik.handleBlur("email")}
+                  value={formik.values.email}
                 />
                 <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
                   <svg
@@ -75,15 +138,79 @@ const Register = () => {
                 </span>
               </div>
             </div>
-
+            {/*  */}
             <div>
-              <label className="sr-only">Password</label>
+              <div className="flex justify-between">
+                <label
+                  className="font-semibold text-sm text-gray-600 pb-1 block"
+                  htmlFor="register"
+                >
+                  Phone
+                </label>
+                <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                  {formik.touched.phone && formik.errors.phone ? (
+                    <div>{formik.errors.phone}</div>
+                  ) : null}
+                </div>
+              </div>
+              <div className="relative">
+                <CustomInput
+                  placeholder="Enter your phone"
+                  className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
+                  name="phone"
+                  type="tel"
+                  onChange={formik.handleChange("phone")}
+                  onBlur={formik.handleBlur("phone")}
+                  value={formik.values.phone}
+                />
+                <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
+                  <svg
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    className="h-6 w-6 text-gray-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                    ></path>
+                    <path
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                    ></path>
+                  </svg>
+                </span>
+              </div>
+            </div>
+            {/*  */}
+            <div>
+              <div className="flex justify-between">
+                <label
+                  className="font-semibold text-sm text-gray-600 pb-1 block"
+                  htmlFor="register"
+                >
+                  Password
+                </label>
+                <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                  {formik.touched.password && formik.errors.password ? (
+                    <div>{formik.errors.password}</div>
+                  ) : null}
+                </div>
+              </div>
               <div className="relative">
                 <CustomInput
                   placeholder="Enter your password"
                   className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                  id="password"
+                  name="password"
                   type="password"
+                  onChange={formik.handleChange("password")}
+                  onBlur={formik.handleBlur("password")}
+                  value={formik.values.password}
                 />
                 <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
                   <svg
@@ -127,12 +254,9 @@ const Register = () => {
                   Login
                 </Link>
               </p>
-              <Link
-                to="/"
-                className="inline-block rounded-lg bg-purple-600 px-5 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-              >
+              <button className="inline-block rounded-lg bg-purple-600 px-5 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
                 Register
-              </Link>
+              </button>
             </div>
           </form>
         </div>

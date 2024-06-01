@@ -9,7 +9,7 @@ import {
 import { Kbd } from "flowbite-react";
 import BreadCrumb from "../components/BreadCrumb";
 import Meta from "../components/Meta";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
@@ -28,6 +28,8 @@ import images from "../assets";
 import ProductCard from "../components/ProductCard";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllProducts } from "../features/products/productSlice";
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },
@@ -88,6 +90,14 @@ function classNames(...classes) {
 const OurStore = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [grid, setGrid] = useState(3);
+  const [activeGrid, setActiveGrid] = useState(4);
+  const dispatch = useDispatch();
+  const productState = useSelector((state) => state.product.products);
+
+  useEffect(() => {
+    dispatch(getAllProducts());
+  }, [dispatch]);
+
   const [checkedColor, setCheckedColor] = useState({
     black: false,
     white: false,
@@ -119,11 +129,13 @@ const OurStore = () => {
 
   const handleGridChange = (newGrid) => {
     setGrid(newGrid);
+    setActiveGrid(grid);
   };
+
   return (
     <>
-      <Meta title={"Our Store"} />
-      <BreadCrumb title="Our Store" />
+      <Meta title={"Sản phẩm"} />
+      <BreadCrumb title="Sản phẩm" />
 
       <Container>
         {/* Mobile filter dialog */}
@@ -316,7 +328,11 @@ const OurStore = () => {
                 <button
                   onClick={() => handleGridChange(3)}
                   type="button"
-                  className=" text-black hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2"
+                  className={`text-white ${
+                    activeGrid === 3
+                      ? "bg-slate-800 opacity-100"
+                      : "bg-slate-200 opacity-85 hover:opacity-100"
+                  } hover:text-white hover:bg-slate-800 transition bg-slate-800 duration-300 rounded-lg p-2`}
                 >
                   <MdOutlineDensitySmall
                     className="h-4 w-4 rotate-90"
@@ -327,7 +343,11 @@ const OurStore = () => {
                 <button
                   onClick={() => handleGridChange(4)}
                   type="button"
-                  className=" text-black hover:text-white hover:bg-slate-800 transition duration-300  bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2"
+                  className={`text-black ${
+                    activeGrid === 4
+                      ? "bg-slate-800 opacity-100"
+                      : "bg-slate-200 opacity-85 hover:opacity-100"
+                  } hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2`}
                 >
                   <MdDensityMedium
                     className="h-4 w-4 rotate-90"
@@ -338,7 +358,11 @@ const OurStore = () => {
                 <button
                   onClick={() => handleGridChange(6)}
                   type="button"
-                  className=" text-black hover:text-white hover:bg-slate-800 transition duration-300  bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2"
+                  className={`text-black ${
+                    activeGrid === 6
+                      ? "bg-slate-800 opacity-100"
+                      : "bg-slate-200 opacity-85 hover:opacity-100"
+                  } hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2`}
                 >
                   <MdDensityLarge
                     className="h-4 w-4 rotate-90"
@@ -349,7 +373,11 @@ const OurStore = () => {
                 <button
                   onClick={() => handleGridChange(12)}
                   type="button"
-                  className=" text-white hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-800 ac  rounded-lg opacity-85 hover:opacity-100 active:opacity-100 p-2"
+                  className={`text-black ${
+                    activeGrid === 12
+                      ? "bg-slate-800 opacity-100"
+                      : "bg-slate-200 opacity-85 hover:opacity-100"
+                  } hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 active:opacity-100 p-2`}
                 >
                   <MdDensityMedium className="h-4 w-4" aria-hidden="true" />
                 </button>
@@ -357,7 +385,7 @@ const OurStore = () => {
                 {/* filter mobile */}
                 <button
                   type="button"
-                  className=" text-black hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 active:opacity-100 p-2  lg:hidden"
+                  className="text-black hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 active:opacity-100 p-2  lg:hidden"
                   onClick={() => setMobileFiltersOpen(true)}
                 >
                   <span className="sr-only">Filters</span>
@@ -715,10 +743,10 @@ const OurStore = () => {
               <div className="col-span-3 py-3 px-5">
                 <div className="bg-white p-5 rounded-lg mb-3">
                   <div className="bg-white rounded-lg gap-4 grid grid-cols-12">
-                    <ProductCard grid={grid} />
-                    <ProductCard grid={grid} />
-                    <ProductCard grid={grid} />
-                    <ProductCard grid={grid} />
+                    <ProductCard
+                      data={productState ? productState : []}
+                      grid={grid}
+                    />
                   </div>
                 </div>
               </div>

@@ -1,18 +1,27 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-import ProductCard from "./ProductCard";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import images from "../assets";
+import { useDispatch } from "react-redux";
+import { getAllProducts } from "../features/products/productSlice";
+import { useEffect } from "react";
+import ProductList from "./ProductList";
 
 export default function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getAllProducts());
+  }, [dispatch]);
+
   return (
     <>
       <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-1 gap-5">
         {/* */}
-        <div className="max-md:col-span-1 py-3 px-3 lg:block hidden rounded-lg bg-white scroll-smooth overflow-hidden lg:overflow-auto lg:max-h-[570px]">
-          {[...Array(7)].map((_, index) => (
+        <div className="max-md:col-span-1 py-3 px-3 lg:block hidden rounded-lg bg-white scroll-smooth overflow-hidden lg:overflow-auto lg:max-h-[430px]">
+          {[...Array(3)].map((_, index) => (
             <div
               key={index}
               className="flex bg-slate-50 hover:bg-slate-200 cursor-pointer rounded-lg p-3 items-center mb-3"
@@ -43,7 +52,7 @@ export default function App() {
         <div className="col-span-2 py-3 bg-white rounded-lg lg:col-span-3 xl:col-span-3">
           <Swiper
             slidesPerView={1}
-            spaceBetween={15}
+            spaceBetween={8}
             rewind={true}
             modules={[Navigation]}
             className="p-2"
@@ -56,24 +65,13 @@ export default function App() {
               },
             }}
           >
-            <SwiperSlide className="px-4">
-              <ProductCard grid={2} />
-            </SwiperSlide>
-            <SwiperSlide className="px-4">
-              <ProductCard grid={2} />
-            </SwiperSlide>
-            <SwiperSlide className="px-4">
-              <ProductCard grid={2} />
-            </SwiperSlide>
-            <SwiperSlide className="px-4">
-              <ProductCard grid={2} />
-            </SwiperSlide>
-            <SwiperSlide className="px-4">
-              <ProductCard grid={2} />
-            </SwiperSlide>
-            <SwiperSlide className="px-4">
-              <ProductCard grid={2} />
-            </SwiperSlide>
+            {[...Array(8)].map((_, index) => {
+              return (
+                <SwiperSlide key={index} className="px-4">
+                  <ProductList number={1} grid={2} />
+                </SwiperSlide>
+              );
+            })}
           </Swiper>
         </div>
       </div>

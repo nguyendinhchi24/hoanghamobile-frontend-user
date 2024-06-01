@@ -4,15 +4,27 @@ import images from "../assets";
 import { IoMdArrowRoundBack, IoMdMailUnread } from "react-icons/io";
 import { FaFacebookSquare } from "react-icons/fa";
 import { SiZalo } from "react-icons/si";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { getABlog } from "../features/blogs/blogSlice";
+import moment from "moment";
 
 const SingleBlog = () => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const getBlogId = location.pathname.split("/")[2];
+  const blogAState = useSelector((state) => state.blog.singleBlog);
+
+  useEffect(() => {
+    dispatch(getABlog(getBlogId));
+  }, [dispatch]);
   return (
     <>
-      <Meta title={"Blog"} />
-      <BreadCrumb title="Blog" />
+      <Meta title={blogAState?.title || "Blog Title"} />
+      <BreadCrumb title={blogAState?.title || "Blog Title"} />
       <Container>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 p-5 ">
           {/*  */}
@@ -80,22 +92,29 @@ const SingleBlog = () => {
             <div className="p-1 border-2 ring-black shadow-lg ring-1 rounded-lg bg-white">
               <div className="rounded-lg flex justify-center items-center ">
                 <img
-                  src={images.blog.card}
+                  src={
+                    blogAState?.images[0]?.url
+                      ? images.blog.card
+                      : images.blog.card
+                  }
                   alt=""
                   className="rounded-lg object-cover w-full h-full"
                 />
               </div>
               <div className="px-5 py-3">
-                <p className="text-sm indent-4 py-2 text-gray-500 font-medium">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna
-                  aliqua.tempor incididunt ut labore et dolore magna aliqua.
-                  tempor incididunt ut labore et dolore magna aliqua. tempor
-                  incididunt ut labore et dolore magna aliqua. tempor incididunt
-                  ut labore et dolore magna aliqua.
-                </p>
+                <p>{blogAState?.title}</p>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: blogAState?.description.substr(0, 70) + "...",
+                  }}
+                  className="text-sm indent-4 py-2 text-gray-500 font-medium"
+                ></p>
                 <div className="flex gap-20 py-2">
-                  <p className="opacity-80 ">1 / 2024</p>
+                  <p className="opacity-80 ">
+                    {moment(blogAState?.created_at).format(
+                      "MMMM Do YYYY, h:mm:ss a"
+                    )}
+                  </p>
                   <p className="opacity-80 ">chibao</p>
                 </div>
               </div>
