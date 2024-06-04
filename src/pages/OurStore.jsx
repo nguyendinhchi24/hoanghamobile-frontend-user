@@ -30,6 +30,7 @@ import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts } from "../features/products/productSlice";
+import { getUserCart } from "../features/user/userSlice";
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },
@@ -90,7 +91,6 @@ function classNames(...classes) {
 const OurStore = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [grid, setGrid] = useState(3);
-  const [activeGrid, setActiveGrid] = useState(4);
   const dispatch = useDispatch();
   const productState = useSelector((state) => state.product.products);
 
@@ -127,9 +127,12 @@ const OurStore = () => {
     });
   };
 
+  useEffect(() => {
+    dispatch(getUserCart());
+  }, [dispatch]);
+
   const handleGridChange = (newGrid) => {
     setGrid(newGrid);
-    setActiveGrid(grid);
   };
 
   return (
@@ -276,7 +279,7 @@ const OurStore = () => {
             </h1>
             <div className="flex items-center justify-between">
               <p className="font-semibold text-slate-500 text-sm mr-3">
-                31 Sản phẩm
+                {productState.length} Sản phẩm
               </p>
               <Menu as="div" className="relative inline-block text-left">
                 <div>
@@ -325,72 +328,68 @@ const OurStore = () => {
 
               {/* action icon */}
               <div className="items-center pl-3 flex gap-2">
-                <button
+                <div
                   onClick={() => handleGridChange(3)}
-                  type="button"
-                  className={`text-white ${
-                    activeGrid === 3
-                      ? "bg-slate-800 opacity-100"
-                      : "bg-slate-200 opacity-85 hover:opacity-100"
-                  } hover:text-white hover:bg-slate-800 transition bg-slate-800 duration-300 rounded-lg p-2`}
+                  className={` ${
+                    grid === 3
+                      ? "bg-slate-800 opacity-100 text-white"
+                      : "bg-slate-200 hover:bg-slate-800 hover:text-white opacity-80 text-gray-800 hover:opacity-100"
+                  } transition duration-300 bg-slate-200 rounded-lg p-2 cursor-pointer`}
                 >
                   <MdOutlineDensitySmall
                     className="h-4 w-4 rotate-90"
                     aria-hidden="true"
                   />
-                </button>
+                </div>
 
-                <button
+                <div
                   onClick={() => handleGridChange(4)}
-                  type="button"
-                  className={`text-black ${
-                    activeGrid === 4
-                      ? "bg-slate-800 opacity-100"
-                      : "bg-slate-200 opacity-85 hover:opacity-100"
-                  } hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2`}
+                  className={` ${
+                    grid === 4
+                      ? "bg-slate-800 opacity-100 text-white"
+                      : "bg-slate-200 hover:bg-slate-800 hover:text-white opacity-80 text-gray-800 hover:opacity-100"
+                  } transition duration-300 bg-slate-200 rounded-lg p-2 cursor-pointer`}
                 >
                   <MdDensityMedium
                     className="h-4 w-4 rotate-90"
                     aria-hidden="true"
                   />
-                </button>
+                </div>
 
-                <button
+                <div
                   onClick={() => handleGridChange(6)}
-                  type="button"
-                  className={`text-black ${
-                    activeGrid === 6
-                      ? "bg-slate-800 opacity-100"
-                      : "bg-slate-200 opacity-85 hover:opacity-100"
-                  } hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 p-2`}
+                  className={` ${
+                    grid === 6
+                      ? "bg-slate-800 opacity-100 text-white"
+                      : "bg-slate-200 hover:bg-slate-800 hover:text-white opacity-80 text-gray-800 hover:opacity-100"
+                  } transition duration-300 bg-slate-200 rounded-lg p-2 cursor-pointer`}
                 >
                   <MdDensityLarge
                     className="h-4 w-4 rotate-90"
                     aria-hidden="true"
                   />
-                </button>
+                </div>
 
-                <button
+                <div
                   onClick={() => handleGridChange(12)}
-                  type="button"
-                  className={`text-black ${
-                    activeGrid === 12
-                      ? "bg-slate-800 opacity-100"
-                      : "bg-slate-200 opacity-85 hover:opacity-100"
-                  } hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 active:opacity-100 p-2`}
+                  className={` ${
+                    grid === 12
+                      ? "bg-slate-800 opacity-100 text-white"
+                      : "bg-slate-200 hover:bg-slate-800 hover:text-white opacity-80 text-gray-800 hover:opacity-100"
+                  } transition duration-300 bg-slate-200 rounded-lg p-2 cursor-pointer`}
                 >
                   <MdDensityMedium className="h-4 w-4" aria-hidden="true" />
-                </button>
+                </div>
 
                 {/* filter mobile */}
-                <button
+                <div
                   type="button"
                   className="text-black hover:text-white hover:bg-slate-800 transition duration-300 bg-slate-200  rounded-lg opacity-85 hover:opacity-100 active:opacity-100 p-2  lg:hidden"
                   onClick={() => setMobileFiltersOpen(true)}
                 >
                   <span className="sr-only">Filters</span>
                   <FunnelIcon className="h-4 w-4" aria-hidden="true" />
-                </button>
+                </div>
               </div>
             </div>
           </div>
@@ -702,7 +701,7 @@ const OurStore = () => {
                 <div className="bg-white p-5 rounded-lg mb-3">
                   <h3 className="font-semibold text-lg">Sản phẩm liên quan</h3>
                   <div className="  p-3 rounded-lg items-center flex flex-col justify-center ">
-                    {[...Array(1)].map((_, index) => (
+                    {[...Array(2)].map((_, index) => (
                       <button
                         key={index}
                         to="/store"

@@ -20,6 +20,7 @@ import { getAllBlogs } from "../features/blogs/blogSlice";
 import moment from "moment";
 import ProductList from "../components/ProductList";
 import { getAllProducts } from "../features/products/productSlice";
+import { getUserCart } from "../features/user/userSlice";
 
 const iconMap = {
   FaShippingFast: FaShippingFast,
@@ -33,11 +34,10 @@ const Home = () => {
   const blogState = useSelector((state) => state.blog.blogs);
   const productState = useSelector((state) => state.product.products);
 
-  console.log(productState);
-
   useEffect(() => {
     dispatch(getAllBlogs());
     dispatch(getAllProducts());
+    dispatch(getUserCart());
   }, [dispatch]);
 
   return (

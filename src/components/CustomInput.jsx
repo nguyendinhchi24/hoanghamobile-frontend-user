@@ -33,7 +33,7 @@ CustomInput.propTypes = {
   className: PropTypes.string,
   onChange: PropTypes.func,
   onBlur: PropTypes.func,
-  value: PropTypes.string,
+  value: PropTypes.any,
 };
 
 export default CustomInput;

@@ -7,8 +7,20 @@ import { Link } from "react-router-dom";
 import images from "../assets";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
+import { useDispatch, useSelector } from "react-redux";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { getUserCart } from "../features/user/userSlice";
 
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
+let checkOutSchema = Yup.object({
+  province: Yup.string().required("Tình/Thành phố không được để trống"),
+  district: Yup.string().required("Quận/Huyện không được để trống"),
+  ward: Yup.string().required("Xã/Phường/Thị trấn không được để trống"),
+  state: Yup.string().required("State không được để trống"),
+  name: Yup.string().required("Name không được để trống"),
+  address: Yup.string().required("Địa chỉ không được để trống"),
+  description: Yup.string(),
+});
 
 const CheckOut = () => {
   const [provinces, setProvinces] = useState([]);
@@ -17,6 +29,26 @@ const CheckOut = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedWard, setSelectedWard] = useState("");
+  const [selectedState, setSelectedState] = useState("");
+  const [total, setTotal] = useState(0);
+  const [shippingInfo, setShippingInfo] = useState(null);
+  const shippingFee = 30000;
+  const dispatch = useDispatch();
+  const cartState = useSelector((state) => state.auth.cartProducts) || [];
+
+  useEffect(() => {
+    dispatch(getUserCart());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (cartState.length) {
+      const totalAmount = cartState.reduce(
+        (acc, item) => acc + item?.productId.price * item?.quantity,
+        0
+      );
+      setTotal(totalAmount);
+    }
+  }, [cartState]);
 
   useEffect(() => {
     axios
@@ -25,27 +57,70 @@ const CheckOut = () => {
   }, []);
 
   const handleProvinceChange = (e) => {
-    const provinceId = e.target.value;
-    setSelectedProvince(provinceId);
-    axios
-      .get(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
-      .then((response) => setDistricts(response.data.results));
-    setWards([]);
-    setSelectedDistrict("");
-    setSelectedWard("");
+    if (e.target.value === "null") {
+      setSelectedProvince("");
+    } else {
+      const provinceId = e.target.value;
+      setSelectedProvince(provinceId);
+      axios
+        .get(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
+        .then((response) => setDistricts(response.data.results));
+      setWards([]);
+      setSelectedDistrict("");
+      setSelectedWard("");
+    }
   };
 
   const handleDistrictChange = (e) => {
-    const districtId = e.target.value;
-    setSelectedDistrict(districtId);
-    axios
-      .get(`https://vapi.vnappmob.com/api/province/ward/${districtId}`)
-      .then((response) => setWards(response.data.results));
-    setSelectedWard("");
+    if (e.target.value === "null") {
+      setSelectedDistrict("");
+    } else {
+      const districtId = e.target.value;
+      setSelectedDistrict(districtId);
+      axios
+        .get(`https://vapi.vnappmob.com/api/province/ward/${districtId}`)
+        .then((response) => setWards(response.data.results));
+      setSelectedWard("");
+    }
   };
 
   const handleWardChange = (e) => {
-    setSelectedWard(e.target.value);
+    if (e.target.value === "null") {
+      setSelectedWard("");
+    } else {
+      setSelectedWard(e.target.value);
+    }
+  };
+
+  const handleStateChange = (e) => {
+    if (e.target.value === "null") {
+      setSelectedState("");
+    } else {
+      setSelectedState(e.target.value);
+    }
+  };
+
+  const formik = useFormik({
+    initialValues: {
+      province: "",
+      district: "",
+      ward: "",
+      state: "",
+      name: "",
+      address: "",
+      description: "",
+    },
+    validationSchema: checkOutSchema,
+    onSubmit: (values) => {
+      setShippingInfo(values);
+    },
+  });
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
   };
 
   return (
@@ -60,50 +135,93 @@ const CheckOut = () => {
               <div className="p-5 bg">
                 <div className="border-b-4">
                   {/* render */}
-                  <div className="flex justify-between my-4 items-center p-4 bg-slate-50 shadow-md rounded-lg">
-                    <div className=" flex items-center">
-                      <div className="relative border-2 w-20 h-20 bg-white flex-shrink-0 mr-4">
-                        <img
-                          src={images.product.anh2}
-                          alt="Iphone 12 pro max"
-                          className="h-full rounded-lg object-cover"
-                        />
-                        <div className="absolute -top-2 -right-2 text-gray-800 font-semibold flex">
-                          <p className="h-6 w-6 text-sm flex items-center justify-center rounded-full bg-gray-200">
-                            10
-                          </p>
-                        </div>
-                      </div>
-                      <div>
-                        <h5 className="text-sm font-medium">
-                          Iphone 12 pro max
-                        </h5>
-                        <p className="text-xs text-gray-500">Description 1</p>
-                        <p className="text-xs text-gray-500">Description 2</p>
-                      </div>
-                    </div>
+                  {cartState &&
+                    cartState.map((item, index) => {
+                      return (
+                        <div
+                          key={index}
+                          className="flex justify-between my-4 items-center p-4 bg-slate-50 shadow-md rounded-lg"
+                        >
+                          <div className=" flex items-center">
+                            <div className="relative border-2 w-20 h-20 bg-white flex-shrink-0 mr-4">
+                              <img
+                                src={images.product.anh2}
+                                alt="Iphone 12 pro max"
+                                className="h-full rounded-lg object-cover"
+                              />
+                              <div className="absolute -top-2 -right-2 text-gray-800 items-center font-semibold flex">
+                                <p className="h-6 w-6 text-gray-900 text-sm flex items-center justify-center rounded-full bg-cyan-200">
+                                  {item?.quantity}
+                                </p>
+                              </div>
+                            </div>
+                            <div>
+                              <h5 className="text-sm font-medium">
+                                {item?.productId.title}
+                              </h5>
+                              <div className="text-gray-500 flex items-center gap-2">
+                                <p>Color:</p>
+                                <span
+                                  className={`text-xs md:text-base text-gray-500`}
+                                >
+                                  {item?.color?.title}
+                                </span>
+                                <div
+                                  key={index}
+                                  className={`w-4 h-4 border border-gray-500 bg-${
+                                    item?.color?.title.toLowerCase() ===
+                                      "black" ||
+                                    item?.color?.title.toLowerCase() === "white"
+                                      ? item?.color?.title.toLowerCase()
+                                      : item?.color?.title.toLowerCase() +
+                                        "-600"
+                                  } rounded-full`}
+                                />
+                              </div>
+                              <p className="text-xs text-gray-500">
+                                Giảm 15% cho học sinh - sinh viên - nhân viên
+                                văn phòng
+                              </p>
+                            </div>
+                          </div>
 
-                    <div className="text-gray-800 font-semibold ">
-                      <p>100.000 VNĐ</p>
-                    </div>
-                  </div>
+                          <div className="text-gray-800 font-semibold ">
+                            <p>
+                              {formatCurrency(item?.price * item?.quantity)}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
 
                   {/*  */}
                 </div>
                 <div className="">
                   <div className="flex justify-between p-2 bg-white border-b rounded-lg my-4">
                     <h3>Tổng tiền hàng</h3>
-                    <p>200.000 VNĐ</p>
+                    <p>
+                      {formatCurrency(total)
+                        ? formatCurrency(total)
+                        : formatCurrency(0)}
+                    </p>
                   </div>
                   <div className="flex justify-between p-2 bg-white border-b rounded-lg my-4">
                     <h3>Phí vận chuyển</h3>
-                    <p>20.000 VNĐ</p>
+                    <p>
+                      {formatCurrency(shippingFee)
+                        ? formatCurrency(shippingFee)
+                        : formatCurrency(0)}
+                    </p>
                   </div>
                 </div>
                 <div className="">
                   <div className="text-black font-semibold text-xl flex justify-between p-2 bg-white border-b rounded-lg my-4">
                     <h3>Tổng thanh toán</h3>
-                    <p>220.000 VNĐ</p>
+                    <p>
+                      {formatCurrency(total + shippingFee)
+                        ? formatCurrency(total + shippingFee)
+                        : formatCurrency(0)}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -121,7 +239,7 @@ const CheckOut = () => {
                   Log out
                 </button>
                 <div className="flex items-center text-gray-800 gap-3 py-4">
-                  <Checkbox {...label} size="small" />
+                  <Checkbox size="small" />
                   <p>Gửi các ưu đãi cho tôi</p>
                 </div>
               </div>
@@ -132,18 +250,34 @@ const CheckOut = () => {
                 <p className="text-sm mb-4 mt-4 text-center text-gray-700">
                   Bạn cẩn phải điền đầy đủ thông tin có dấu *
                 </p>
-                <form>
-                  {/*  */}
+
+                <form onSubmit={formik.handleSubmit}>
+                  {/* province */}
                   <div className="flex flex-col">
-                    <label htmlFor="tinh" className="py-1 -ml-2 text-gray-500">
-                      TỈnh Hoặc Thành Phố
-                    </label>
+                    <div className="flex justify-between">
+                      <div className="flex gap-3 items-center">
+                        <label
+                          className="font-semibold text-sm text-gray-600 pb-1 block"
+                          htmlFor="checkOut"
+                        >
+                          Tỉnh/Thành phố
+                        </label>
+                        <p className="text-red-600 text-lg">*</p>
+                      </div>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {!selectedProvince ? (
+                          <div>{formik.errors.province}</div>
+                        ) : null}
+                      </div>
+                    </div>
                     <select
                       className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
+                      name="province"
+                      onBlur={formik.handleBlur("province")}
                       value={selectedProvince}
                       onChange={handleProvinceChange}
                     >
-                      <option value="">Tỉnh/Thành phố *</option>
+                      <option value="null">Tỉnh/Thành phố *</option>
                       {provinces.map((province) => (
                         <option
                           key={province.province_id}
@@ -154,18 +288,33 @@ const CheckOut = () => {
                       ))}
                     </select>
                   </div>
-                  {/*  */}
+                  {/* district */}
                   <div className="flex flex-col">
-                    <label htmlFor="tinh" className="py-1 -ml-2 text-gray-500">
-                      Quận hoặc Huyện
-                    </label>
+                    <div className="flex justify-between">
+                      <div className="flex gap-3 items-center">
+                        <label
+                          className="font-semibold text-sm text-gray-600 pb-1 block"
+                          htmlFor="checkOut"
+                        >
+                          Quận/Huyện
+                        </label>
+                        <p className="text-red-600 text-lg">*</p>
+                      </div>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {!selectedDistrict ? (
+                          <div>{formik.errors.district}</div>
+                        ) : null}
+                      </div>
+                    </div>
                     <select
                       className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
+                      name="district"
+                      onBlur={formik.handleBlur("district")}
                       value={selectedDistrict}
                       onChange={handleDistrictChange}
                       disabled={!selectedProvince}
                     >
-                      <option value="Quận/Huyện *">Quận/Huyện *</option>
+                      <option value="null">Quận/Huyện</option>
                       {districts.map((district) => (
                         <option
                           key={district.district_id}
@@ -176,62 +325,146 @@ const CheckOut = () => {
                       ))}
                     </select>
                   </div>
-                  {/*  */}
+                  {/* ward */}
                   <div className="flex flex-col">
-                    <label htmlFor="tinh" className="py-1 -ml-2 text-gray-500">
-                      Xã, Phường, Thị trấn
-                    </label>
+                    <div className="flex justify-between">
+                      <div className="flex gap-3 items-center">
+                        <label
+                          className="font-semibold text-sm text-gray-600 pb-1 block"
+                          htmlFor="checkOut"
+                        >
+                          Xã/Phường/Thị trấn
+                        </label>
+                        <p className="text-red-600 text-lg">*</p>
+                      </div>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {!selectedWard ? <div>{formik.errors.ward}</div> : null}
+                      </div>
+                    </div>
                     <select
                       className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
+                      name="word"
+                      onBlur={formik.handleBlur("word")}
                       value={selectedWard}
                       onChange={handleWardChange}
                       disabled={!selectedDistrict}
                     >
-                      <option value="">Xã/Phường/Thị trấn</option>
-                      {wards.map((ward) => (
-                        <option key={ward.ward_id} value={ward.ward_id}>
-                          {ward.ward_name}
-                        </option>
-                      ))}
+                      <option value="null">Xã/Phường/Thị trấn</option>
+                      {selectedDistrict &&
+                        wards.map((ward) => (
+                          <option key={ward.ward_id} value={ward.ward_id}>
+                            {ward.ward_name}
+                          </option>
+                        ))}
                     </select>
                   </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="name"
-                      className="block text-gray-700 font-medium mb-2"
+                  <div className="flex flex-col">
+                    <div className="flex justify-between">
+                      <div className="flex gap-3 items-center">
+                        <label
+                          className="font-semibold text-sm text-gray-600 pb-1 block"
+                          htmlFor="checkOut"
+                        >
+                          State
+                        </label>
+                        <p className="text-red-600 text-lg">*</p>
+                      </div>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {!selectedState ? (
+                          <div>{formik.errors.state}</div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <select
+                      name="state"
+                      onChange={handleStateChange}
+                      onBlur={formik.handleBlur("state")}
+                      value={selectedState}
+                      className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
                     >
-                      Name
-                    </label>
+                      <option value="null">State</option>
+                      <option value="State2">State1</option>
+                      <option value="State2">State2</option>
+                      <option value="State2">State3</option>
+                      <option value="State2">State4</option>
+                    </select>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex justify-between">
+                      <div className="flex gap-3 items-center">
+                        <label
+                          className="font-semibold text-sm text-gray-600 pb-1 block"
+                          htmlFor="checkOut"
+                        >
+                          Name
+                        </label>
+                        <p className="text-red-600 text-lg">*</p>
+                      </div>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.name && formik.errors.name ? (
+                          <div>{formik.errors.name}</div>
+                        ) : null}
+                      </div>
+                    </div>
                     <CustomInput
                       type="text"
                       name="name"
-                      id="name"
+                      onChange={formik.handleChange("name")}
+                      onBlur={formik.handleBlur("name")}
+                      value={formik.values.name}
                       className="w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="address"
-                      className="block text-gray-700 font-medium mb-2"
-                    >
-                      Address
-                    </label>
+                    <div className="flex justify-between">
+                      <div className="flex gap-3 items-center">
+                        <label
+                          className="font-semibold text-sm text-gray-600 pb-1 block"
+                          htmlFor="checkOut"
+                        >
+                          Địa chỉ cụ thể
+                        </label>
+                        <p className="text-red-600 text-lg">*</p>
+                      </div>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.address && formik.errors.address ? (
+                          <div>{formik.errors.address}</div>
+                        ) : null}
+                      </div>
+                    </div>
                     <CustomInput
                       type="text"
                       name="address"
-                      id="address"
+                      onChange={formik.handleChange("address")}
+                      onBlur={formik.handleBlur("address")}
+                      value={formik.values.address}
                       className="w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div className="mb-4">
-                    <label
-                      htmlFor="note"
-                      className="block text-gray-700 font-medium mb-2"
-                    >
-                      Ghi chú
-                    </label>
+                    <div className="flex justify-between">
+                      <div className="flex gap-3 items-center">
+                        <label
+                          className="font-semibold text-sm text-gray-600 pb-1 block"
+                          htmlFor="checkOut"
+                        >
+                          Ghi chú
+                        </label>
+                        <p className="text-red-600 text-lg">*</p>
+                      </div>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.description &&
+                        formik.errors.description ? (
+                          <div>{formik.errors.description}</div>
+                        ) : null}
+                      </div>
+                    </div>
                     <textarea
                       name="description"
+                      onChange={formik.handleChange("description")}
+                      onBlur={formik.handleBlur("description")}
+                      value={formik.values.description}
                       className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
                       placeholder="Nhận xét"
                     ></textarea>

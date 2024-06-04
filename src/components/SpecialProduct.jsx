@@ -24,6 +24,12 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 }));
 
 const SpecialProduct = ({ data }) => {
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
   return (
     <>
       {data.map((item, index) => {
@@ -52,7 +58,7 @@ const SpecialProduct = ({ data }) => {
                     size="small"
                   />
                   <p className="text-red-600 text-base font-medium flex">
-                    <span>{item.price} VNĐ</span> &nbsp;{" "}
+                    <span>{formatCurrency(item.price)}</span> &nbsp;{" "}
                     <strike className="text-gray-500">8.500.000 VNĐ</strike>
                   </p>
                   <div className="flex items-center p-3 gap-2">

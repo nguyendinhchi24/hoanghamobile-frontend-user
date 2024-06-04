@@ -1,12 +1,12 @@
 import Meta from "../components/Meta";
 import BreadCrumb from "../components/BreadCrumb";
 import Container from "../components/Container";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CustomInput from "../components/CustomInput";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch } from "react-redux";
-import { loginUser } from "../features/user/userSlice";
+import { loginUser, resetState } from "../features/user/userSlice";
 
 let loginSchema = Yup.object({
   email: Yup.string()
@@ -17,6 +17,7 @@ let loginSchema = Yup.object({
 
 const Login = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const formik = useFormik({
     initialValues: {
@@ -26,6 +27,10 @@ const Login = () => {
     validationSchema: loginSchema,
     onSubmit: (values) => {
       dispatch(loginUser(values));
+      dispatch(resetState());
+      setTimeout(() => {
+        navigate("/");
+      }, 500);
     },
   });
   return (
@@ -64,8 +69,8 @@ const Login = () => {
                 <CustomInput
                   placeholder="Enter your email"
                   className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                  id="email"
                   type="email"
+                  name="email"
                   onChange={formik.handleChange("email")}
                   onBlur={formik.handleBlur("email")}
                   value={formik.values.email}

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Disclosure, Popover, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
@@ -9,6 +9,8 @@ import {
 
 import data from "./data.json";
 import CustomInput from "./CustomInput";
+import { useDispatch, useSelector } from "react-redux";
+import { getUserCart, resetState } from "../features/user/userSlice";
 
 const products = data;
 function classNames(...classes) {
@@ -18,7 +20,28 @@ function classNames(...classes) {
 export default function Example() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const userCartState = useSelector((state) => state.auth.cartProducts) || [];
+  const authState = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const itemCount = userCartState.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+  const totalAmount = userCartState.reduce(
+    (total, item) => total + item.productId.price * item.quantity,
+    0
+  );
+  useEffect(() => {
+    dispatch(getUserCart());
+    dispatch(resetState());
+  }, [dispatch]);
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
   const handleItemClick = () => {
     setIsOpen(false);
   };
@@ -147,22 +170,22 @@ export default function Example() {
               <span>Liên hệ </span>
             </Link>
             <Link
-              to="/login"
+              to={authState && authState?.user === null ? "/login" : "/"}
               href="#"
               className="text-[15px] font-semibold leading-6 hover:text-cyan-900 text-black outline-none"
             >
-              <span>Đăng nhập</span>
+              {authState && authState?.user === null ? (
+                <span>Đăng nhập</span>
+              ) : (
+                <span>{authState?.user?.name}</span>
+              )}
             </Link>
 
             {/* cart */}
-            <a
-              href="#"
-              className="text-[15px] font-semibold leading-6  text-black outline-none"
-            >
+            <div className="text-[15px] font-semibold leading-6  text-black outline-none">
               <div className="hidden lg:flex lg:flex-1 lg:justify-end outline-none">
                 <Link
                   to={"/cart"}
-                  href="#"
                   className="flex items-center text-[15px] font-semibold leading-6 text-black outline-none hover:opacity-100 opacity-90 hover:text-cyan-900"
                 >
                   <svg
@@ -179,14 +202,14 @@ export default function Example() {
                     />
                   </svg>
                   <span className="px-2 rounded py-1 bg-cyan-200 text-xs ">
-                    7
+                    {itemCount}
                   </span>
                   <span className="ml-2 underline text-red-600">
-                    1.000.000 VNĐ
+                    {formatCurrency(totalAmount)}
                   </span>
                 </Link>
               </div>
-            </a>
+            </div>
           </Popover.Group>
         </nav>
 

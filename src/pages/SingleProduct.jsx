@@ -1,7 +1,7 @@
 import Meta from "../components/Meta";
 import BreadCrumb from "../components/BreadCrumb";
 import images from "../assets";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Checkbox, Rating } from "@mui/material";
 import { useRef, useState } from "react";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
@@ -25,6 +25,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getAProduct } from "../features/products/productSlice";
 import { toast } from "react-toastify";
+import ColorComponent from "../components/ColorComponent";
+import { addProdToCart } from "../features/user/userSlice";
+import { getUserCart } from "../features/user/userSlice";
 
 const slides = [
   {
@@ -51,17 +54,51 @@ const sliderSettings = {
 };
 
 const SingleProduct = () => {
+  const sliderRef = useRef();
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const [color, setColor] = useState(null);
+  const [quantity, setQuantity] = useState(1);
   const [orderedProduct, setorderedProduct] = useState(true);
   const [selectedSlide, setSelectedSlide] = useState(0);
   const [expanded, setExpanded] = useState(false);
-  const sliderRef = useRef();
-  const location = useLocation();
+  const [alreadyAdded, setAlreadyAdded] = useState(false);
+  const navigate = useNavigate();
   const getProductId = location.pathname.split("/")[2];
   const productState = useSelector((state) => state.product.singleProduct);
-  const dispatch = useDispatch();
+  const cartState = useSelector((state) => state.auth.cartProducts);
+
   useEffect(() => {
     dispatch(getAProduct(getProductId));
+    dispatch(getUserCart());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (cartState && getProductId) {
+      for (let index = 0; index < cartState.length; index++) {
+        if (getProductId === cartState[index]?.productId?._id) {
+          setAlreadyAdded(true);
+        }
+      }
+    }
+  }, [cartState, getProductId]);
+
+  const uploadCart = () => {
+    if (color === null) {
+      toast.error("Vui lòng chọn một màu!");
+      return false;
+    } else {
+      dispatch(
+        addProdToCart({
+          productId: productState?._id,
+          quantity,
+          color,
+          price: productState?.price,
+        })
+      );
+      navigate("/cart");
+    }
+  };
 
   const handleThumbnailClick = (index) => {
     setSelectedSlide(index);
@@ -81,10 +118,19 @@ const SingleProduct = () => {
     textField.remove();
     toast.success("Copy thành công!");
   };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
   return (
     <>
-      <Meta title={"Product name"} />
-      <BreadCrumb title="Product name" />
+      <Meta title={productState?.title ? productState?.title : "Product"} />
+      <BreadCrumb
+        title={productState?.title ? productState?.title : "Product"}
+      />
       {/*  */}
       <Container>
         <section className="mx-auto p-5 space-y-8">
@@ -136,7 +182,7 @@ const SingleProduct = () => {
                 <div className="space-y-1">
                   <h3 className="text-3xl font-bold">{productState?.title}</h3>
                   <h3 className="text-xl text-red-600 font-bold pt-3 px-3 underline">
-                    {productState?.price} VNĐ
+                    {formatCurrency(productState?.price)}
                   </h3>
                 </div>
                 <div className="flex items-center justify-between text-gray-500 ">
@@ -182,53 +228,50 @@ const SingleProduct = () => {
                     <h3 className="w-28 font-medium">Availability:</h3>
                     <p>In stock: 54</p>
                   </div>
-                  <div className="flex items-center">
-                    <h3 className="w-28 font-medium">Color:</h3>
-                    <div className="flex items-center space-x-2">
-                      <div className="flex items-center space-x-2">
-                        <div className="text-gray-500">
-                          {productState?.color[0]}
-                        </div>
-                        <div
-                          className={`w-6 h-6 bg-${productState?.color[0].toLowerCase()} rounded-full`}
-                        ></div>
+                  {alreadyAdded === false && (
+                    <>
+                      <div className="flex items-center">
+                        <h3 className="w-28 font-medium">Color:</h3>
+                        <ColorComponent
+                          setColor={setColor}
+                          data={productState ? productState?.color : []}
+                        />
                       </div>
-                      {/* {productState?.color.map((color, index) => (
-                        <div
-                          key={index}
-                          className="flex items-center space-x-2"
-                        >
-                          <div className="text-gray-500">{color}</div>
-                          <div
-                            className={`w-6 h-6 border border-gray-500 bg-${color.toLowerCase()} rounded-full`}
-                          ></div>
-                        </div>
-                      ))} */}
-                    </div>
-                  </div>
+                    </>
+                  )}
 
                   <div className="flex items-center justify-between mt-4">
-                    <div className="flex items-center">
-                      <h3 className="w-28 font-medium">Quantity:</h3>
-                      <CustomInput
-                        type="number"
-                        defaultValue={1}
-                        className="w-14 p-1 border rounded"
-                      />
-                    </div>
+                    {/*  */}
+                    {alreadyAdded === false && (
+                      <>
+                        <div className="flex items-center">
+                          <h3 className="w-28 font-medium">Quantity:</h3>
+                          <CustomInput
+                            onChange={(e) => setQuantity(e.target.value)}
+                            type="number"
+                            value={quantity}
+                            className="w-14 p-1 border rounded"
+                          />
+                        </div>
+                      </>
+                    )}
+
+                    {/*  */}
                     <div className="flex space-x-4 items-center">
-                      <Link
-                        to=""
+                      <button
+                        onClick={() => {
+                          alreadyAdded ? navigate("/cart") : uploadCart();
+                        }}
                         className="bg-blue-500 text-white font-medium py-2 px-6 rounded-lg hover:bg-blue-600"
                       >
-                        Add to Cart
-                      </Link>
-                      <Link
+                        {alreadyAdded ? "Go To Cart" : "Add to Cart"}
+                      </button>
+                      {/* <Link
                         to="/cart"
                         className="bg-green-500 text-white font-medium py-2 px-6 rounded-lg hover:bg-green-600"
                       >
                         Buy it Now
-                      </Link>
+                      </Link> */}
                     </div>
                   </div>
 
@@ -253,7 +296,7 @@ const SingleProduct = () => {
                         Product Link:
                       </p>
                       <a
-                        href="javascript:void(0);"
+                        href="javascript:void(0)"
                         onClick={() => {
                           copyToClipboard(window.location.href);
                         }}

@@ -39,19 +39,24 @@ const WishList = () => {
   }, [dispatch]);
 
   const removeFromWishList = (id) => {
-    dispatch(addToWishList(id));
-    setTimeout(() => {
+    dispatch(addToWishList(id)).then(() => {
       dispatch(getUserProductWishList());
-    }, 300);
+    });
   };
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
   return (
     <>
       <Meta title={"Wish List"} />
       <BreadCrumb title="Wish List" />
       <Container>
         <div className="grid grid-cols-1 xl:grid-cols-10 lg:grid-cols-8 md:grid-cols-6 sm:grid-cols-4 gap-6 p-6 bg-gray-100">
-          {wishListState && wishListState.length == 0 && (
+          {wishListState && wishListState.length === 0 && (
             <div className="text-center text-2xl text-gray-500 font-bold col-span-1 md:col-span-10">
               No Data
             </div>
@@ -82,7 +87,7 @@ const WishList = () => {
                     {item.title}
                   </h5>
                   <p className="text-base font-medium text-red-500 mb-4">
-                    Giá: {item?.price} VNĐ
+                    Giá: {formatCurrency(item?.price)}
                     <sub className="pl-2 text-sm line-through text-gray-500">
                       500000
                     </sub>

@@ -9,20 +9,36 @@ import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import CompareArrowsOutlinedIcon from "@mui/icons-material/CompareArrowsOutlined";
 import images from "../assets";
+import { useState } from "react";
 
 const ProductCard = ({ data, grid }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [likedItems, setLikedItems] = useState(() => {
+    const savedLikes = JSON.parse(localStorage.getItem("likedItems")) || {};
+    return savedLikes;
+  });
+
   const addToWish = (id) => {
+    const updatedLikes = { ...likedItems, [id]: !likedItems[id] };
+    setLikedItems(updatedLikes);
+    localStorage.setItem("likedItems", JSON.stringify(updatedLikes));
+
     dispatch(addToWishList(id));
   };
 
   const handleNavigation = (e, id) => {
     e.stopPropagation();
-    console.log("Navigating to: /product/" + id);
     navigate("/product/" + id);
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
   };
 
   return (
@@ -39,6 +55,7 @@ const ProductCard = ({ data, grid }) => {
               grid === 12 ? "flex" : ""
             } group hover:scale-105 transition-all duration-300 hover:bg-slate-100 relative select-none shadow shadow-red-400 bg-white rounded-lg`}
           >
+            {/* Nút like với trạng thái được lưu trữ */}
             <div
               onClick={() => {
                 addToWish(item._id);
@@ -50,6 +67,8 @@ const ProductCard = ({ data, grid }) => {
                   <Checkbox
                     icon={<FavoriteBorder />}
                     checkedIcon={<Favorite className="text-red-500" />}
+                    // Sử dụng trạng thái liked từ localStorage
+                    checked={!!likedItems[item._id]}
                   />
                 </IconButton>
               </Tooltip>
@@ -58,7 +77,7 @@ const ProductCard = ({ data, grid }) => {
               <img
                 src={images.product.watch}
                 alt=""
-                className=" object-cover h-48 w-full md:h-full md:w-48 pointer-events-none transition duration-300"
+                className="object-cover h-48 w-full md:h-full md:w-48 pointer-events-none transition duration-300"
               />
             </div>
             <Link
@@ -84,7 +103,9 @@ const ProductCard = ({ data, grid }) => {
                 size="small"
                 className="pt-3"
               />
-              <p className="text-red-600 text-lg font-bold">{item.price} VNĐ</p>
+              <p className="text-red-600 text-lg font-bold">
+                {formatCurrency(item.price)}
+              </p>
               <p className="text-slate-500 overflow-hidden whitespace-nowrap text-ellipsis">
                 {item.description}
               </p>
