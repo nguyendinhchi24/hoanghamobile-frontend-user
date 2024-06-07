@@ -2,7 +2,6 @@ import Meta from "../components/Meta";
 import BreadCrumb from "../components/BreadCrumb";
 import { Checkbox } from "flowbite-react";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import images from "../assets";
 import Container from "../components/Container";
@@ -12,10 +11,76 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { getUserCart } from "../features/user/userSlice";
 
+let Districts = [
+  {
+    districts_id: 1,
+    districts_name: "Hà Nội",
+    data: [
+      { value: "1", name: "Quận Ba Đình" },
+      { value: "2", name: "Quận Hoàn Kiếm" },
+      { value: "3", name: "Quận Tây Hồ" },
+      { value: "4", name: "Quận Long Biên" },
+      { value: "5", name: "Quận Cầu Giấy" },
+      { value: "6", name: "Quận Đống Đa" },
+      { value: "7", name: "Quận Hai Bà Trưng" },
+      { value: "8", name: "Quận Hoàng Mai" },
+      { value: "9", name: "Quận Thanh Xuân" },
+      { value: "10", name: "Huyện Sóc Sơn" },
+      { value: "11", name: "Huyện Đông Anh" },
+      { value: "12", name: "Huyện Gia Lâm" },
+      { value: "13", name: "Quận Nam Từ Liêm" },
+      { value: "14", name: "Huyện Thanh Trì" },
+      { value: "15", name: "Quận Bắc Từ Liêm" },
+      { value: "16", name: "Huyện Mê Linh" },
+      { value: "17", name: "Quận Hà Đông" },
+      { value: "18", name: "Thị xã Sơn Tây" },
+      { value: "19", name: "Huyện Ba Vì" },
+      { value: "20", name: "Huyện Phúc Thọ" },
+      { value: "21", name: "Huyện Đan Phượng" },
+      { value: "22", name: "Huyện Hoài Đức" },
+      { value: "23", name: "Huyện Quốc Oai" },
+      { value: "24", name: "Huyện Thạch Thất" },
+      { value: "25", name: "Huyện Chương Mỹ" },
+      { value: "26", name: "Huyện Thanh Oai" },
+      { value: "27", name: "Huyện Thường Tín" },
+      { value: "28", name: "Huyện Phú Xuyên" },
+      { value: "29", name: "Huyện Ứng Hòa" },
+      { value: "30", name: "Huyện Mỹ Đức" },
+    ],
+  },
+  {
+    districts_id: 2,
+    districts_name: "Bắc Giang",
+    data: [
+      { value: "1", name: "Thành phố Bắc Giang" },
+      { value: "2", name: "Huyện Yên Thế" },
+      { value: "3", name: "Huyện Tân Yên" },
+      { value: "4", name: "Huyện Lạng Giang" },
+      { value: "4", name: "Huyện Lục Nam" },
+      { value: "5", name: "Huyện Sơn Động" },
+      { value: "6", name: "Huyện Yên Dũng" },
+      { value: "7", name: "Huyện Hiệp Hòa" },
+      { value: "8", name: "Huyện Việt Yên" },
+    ],
+  },
+  {
+    districts_id: 3,
+    districts_name: "Bắc Ninh",
+    data: [
+      { value: "1", name: "Thành phố Bắc Ninh" },
+      { value: "2", name: "Thành phố Bắc Ninh" },
+      { value: "3", name: "Huyện Yên Phong" },
+      { value: "4", name: "Huyện Quế Võ" },
+      { value: "5", name: "Huyện Tiên Du" },
+      { value: "6", name: "Thị xã Từ Sơn" },
+      { value: "7", name: "Huyện Thuận Thành" },
+      { value: "8", name: "Huyện Gia Bình" },
+      { value: "9", name: "Huyện Lương Tài" },
+    ],
+  },
+];
+
 let checkOutSchema = Yup.object({
-  province: Yup.string().required("Tình/Thành phố không được để trống"),
-  district: Yup.string().required("Quận/Huyện không được để trống"),
-  ward: Yup.string().required("Xã/Phường/Thị trấn không được để trống"),
   state: Yup.string().required("State không được để trống"),
   name: Yup.string().required("Name không được để trống"),
   address: Yup.string().required("Địa chỉ không được để trống"),
@@ -23,18 +88,13 @@ let checkOutSchema = Yup.object({
 });
 
 const CheckOut = () => {
-  const [provinces, setProvinces] = useState([]);
-  const [districts, setDistricts] = useState([]);
-  const [wards, setWards] = useState([]);
-  const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedDistrict, setSelectedDistrict] = useState("");
-  const [selectedWard, setSelectedWard] = useState("");
   const [selectedState, setSelectedState] = useState("");
   const [total, setTotal] = useState(0);
-  const [shippingInfo, setShippingInfo] = useState(null);
+  const [items, setItems] = useState([]);
   const shippingFee = 30000;
   const dispatch = useDispatch();
   const cartState = useSelector((state) => state.auth.cartProducts) || [];
+  const userState = useSelector((state) => state.auth.user) || [];
 
   useEffect(() => {
     dispatch(getUserCart());
@@ -50,72 +110,68 @@ const CheckOut = () => {
     }
   }, [cartState]);
 
-  useEffect(() => {
-    axios
-      .get("https://vapi.vnappmob.com/api/province/")
-      .then((response) => setProvinces(response.data.results));
-  }, []);
-
-  const handleProvinceChange = (e) => {
-    if (e.target.value === "null") {
-      setSelectedProvince("");
-    } else {
-      const provinceId = e.target.value;
-      setSelectedProvince(provinceId);
-      axios
-        .get(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
-        .then((response) => setDistricts(response.data.results));
-      setWards([]);
-      setSelectedDistrict("");
-      setSelectedWard("");
-    }
+  const handlePayment = async (values) => {
+    console.log("submit", values);
+    // try {
+    //   const response = await axios.post("http://localhost:5000/payment", {
+    //     items: [
+    //       {
+    //         id: "204727",
+    //         name: "YOMOST Bac Ha&Viet Quat 170ml",
+    //         description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
+    //         category: "beverage",
+    //         imageUrl: "https://momo.vn/uploads/product1.jpg",
+    //         manufacturer: "Vinamilk",
+    //         price: 11000,
+    //         quantity: 5,
+    //         unit: "hộp",
+    //         totalPrice: 55000,
+    //         taxAmount: "200",
+    //       },
+    //     ],
+    //     userInfo: {
+    //       name: "Nguyen Van A",
+    //       phoneNumber: "0999888999",
+    //       email: "email_add@domain.com",
+    //     },
+    //     accessKey: "F8BBA842ECF85",
+    //     secretKey: "K951B6PE1waDMi640xX08PD3vg6EkVlz",
+    //     partnerCode: "MOMO",
+    //     redirectUrl: "http://localhost:3000/success",
+    //     ipnUrl: "https://ed1a-171-224-28-242.ngrok-free.app/callback",
+    //     requestType: "payWithMethod",
+    //     extraData: "eyJ1c2VybmFtZSI6ICJtb21vIn0",
+    //     orderGroupId: "",
+    //     autoCapture: true,
+    //     lang: "vi",
+    //   });
+    //   setShippingInfo(response.data);
+    // } catch (error) {
+    //   console.error("Error during payment:", error);
+    // }
   };
 
-  const handleDistrictChange = (e) => {
-    if (e.target.value === "null") {
-      setSelectedDistrict("");
-    } else {
-      const districtId = e.target.value;
-      setSelectedDistrict(districtId);
-      axios
-        .get(`https://vapi.vnappmob.com/api/province/ward/${districtId}`)
-        .then((response) => setWards(response.data.results));
-      setSelectedWard("");
-    }
-  };
-
-  const handleWardChange = (e) => {
-    if (e.target.value === "null") {
-      setSelectedWard("");
-    } else {
-      setSelectedWard(e.target.value);
-    }
-  };
-
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      address: "",
+      description: "",
+      state: "",
+    },
+    validationSchema: checkOutSchema,
+    onSubmit: (values) => {
+      console.log("addd", values);
+      handlePayment(values);
+    },
+  });
   const handleStateChange = (e) => {
     if (e.target.value === "null") {
       setSelectedState("");
     } else {
       setSelectedState(e.target.value);
+      formik.setFieldValue("state", e.target.value);
     }
   };
-
-  const formik = useFormik({
-    initialValues: {
-      province: "",
-      district: "",
-      ward: "",
-      state: "",
-      name: "",
-      address: "",
-      description: "",
-    },
-    validationSchema: checkOutSchema,
-    onSubmit: (values) => {
-      setShippingInfo(values);
-    },
-  });
-
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -125,12 +181,12 @@ const CheckOut = () => {
 
   return (
     <>
-      <Meta title={"Hóa đơn"} />
-      <BreadCrumb title="Hóa đơn" />
+      <Meta title={"Order History"} />
+      <BreadCrumb title="Order History" />
       <Container>
         <section>
           <div className="grid lg:grid-cols-12 p-5 gap-6">
-            {/*  */}
+            {/* product */}
             <div className="col-span-6 p-8 bg-white rounded-lg">
               <div className="p-5 bg">
                 <div className="border-b-4">
@@ -226,51 +282,307 @@ const CheckOut = () => {
                 </div>
               </div>
             </div>
-            {/*  */}
+            {/* address */}
             <div className="col-span-6 p-8 bg-white rounded-lg">
               <div className="border-b ">
                 <h3 className="text-center font-medium text-lg text-gray-900">
                   Thôn tin liên hệ
                 </h3>
-                <p className="py-2 text-gray-800">
-                  Tiếp tục với (nguyenchi240702@gmail.com)
-                </p>
-                <button className="p-1 px-2 hover:underline text-gray-800 hover:text-black">
-                  Log out
-                </button>
+                <div className="flex gap-3">
+                  <p className="py-2 text-gray-800">Name: {userState.name}</p>
+                  <p className="py-2 text-gray-800">Email: {userState.email}</p>
+                  <p className="py-2 text-gray-800">Phone: {userState.phone}</p>
+                </div>
                 <div className="flex items-center text-gray-800 gap-3 py-4">
                   <Checkbox size="small" />
                   <p>Gửi các ưu đãi cho tôi</p>
                 </div>
               </div>
               <div className="">
-                <h3 className="text-center mt-2 mb-1 font-medium text-lg text-gray-900">
-                  Thông tin đặt hàng
-                </h3>
-                <p className="text-sm mb-4 mt-4 text-center text-gray-700">
-                  Bạn cẩn phải điền đầy đủ thông tin có dấu *
-                </p>
+                <div>
+                  <h3 className="text-center mt-2 mb-1 font-medium text-lg text-gray-900">
+                    Thông tin đặt hàng
+                  </h3>
+                  <p className="text-sm mb-4 mt-4 text-center text-gray-700">
+                    Bạn cẩn phải điền đầy đủ thông tin có dấu *
+                  </p>
+                </div>
 
                 <form onSubmit={formik.handleSubmit}>
-                  {/* province */}
-                  <div className="flex flex-col">
+                  {/* name */}
+                  <div className="mb-4">
                     <div className="flex justify-between">
                       <div className="flex gap-3 items-center">
-                        <label
-                          className="font-semibold text-sm text-gray-600 pb-1 block"
-                          htmlFor="checkOut"
-                        >
-                          Tỉnh/Thành phố
+                        <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                          Name
                         </label>
                         <p className="text-red-600 text-lg">*</p>
                       </div>
                       <div className="error text-red-500 text-sm p-0 m-0 font-medium">
-                        {!selectedProvince ? (
-                          <div>{formik.errors.province}</div>
+                        {formik.touched.name && formik.errors.name ? (
+                          <div>{formik.errors.name}</div>
                         ) : null}
                       </div>
                     </div>
-                    <select
+                    <CustomInput
+                      className="w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter your name"
+                      type="text"
+                      name="name"
+                      onChange={formik.handleChange("name")}
+                      onBlur={formik.handleBlur("name")}
+                      value={formik.values.name}
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex justify-between">
+                      <div className="flex gap-3 items-center">
+                        <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                          Địa chỉ cụ thể
+                        </label>
+                        <p className="text-red-600 text-lg">*</p>
+                      </div>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.address && formik.errors.address ? (
+                          <div>{formik.errors.address}</div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <CustomInput
+                      className="w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter your Address"
+                      type="text"
+                      name="address"
+                      onChange={formik.handleChange("address")}
+                      onBlur={formik.handleBlur("address")}
+                      value={formik.values.address}
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <div className="flex justify-between">
+                      <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                        Ghi chú
+                      </label>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.description &&
+                        formik.errors.description ? (
+                          <div>{formik.errors.description}</div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <textarea
+                      name="description"
+                      onChange={formik.handleChange("description")}
+                      onBlur={formik.handleBlur("description")}
+                      value={formik.values.description}
+                      className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
+                      placeholder="Ghi chú"
+                    ></textarea>
+                  </div>
+                  <div className="mb-4">
+                    {/* state */}
+                    <div className="flex flex-col">
+                      <div className="flex justify-between">
+                        <div className="flex gap-3 items-center">
+                          <label
+                            className="font-semibold text-sm text-gray-600 pb-1 block"
+                            htmlFor="checkOut"
+                          >
+                            State
+                          </label>
+                          <p className="text-red-600 text-lg">*</p>
+                        </div>
+                        <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                          {!selectedState ? (
+                            <div>{formik.errors.state}</div>
+                          ) : null}
+                        </div>
+                      </div>
+                      <select
+                        name="state"
+                        onChange={handleStateChange}
+                        onBlur={formik.handleBlur("state")}
+                        value={selectedState}
+                        className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
+                      >
+                        <option value="">Phương thức thanh toán</option>
+                        <option value="money">Thanh toán khi nhận hàng</option>
+                        <option value="momo">Thanh toán qua MoMo</option>
+                        <option value="banking">
+                          Thanh toán Internet Banking
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex justify-between">
+                    <Link
+                      to="/"
+                      className="flex items-center duration-300 hover:gap-2 hover:-translate-x-3 justify-center gap-2 tracking-widest p-3 opacity-80 
+                    border-2 text-gray-900 hover:opacity-100 hover:border-red-500 px-4 bg-white rounded-lg font-medium"
+                    >
+                      <svg
+                        className="w-5 h-5 rotate-180"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                          strokeLinejoin="round"
+                          strokeLinecap="round"
+                        ></path>
+                      </svg>
+                      <p>Quay lại</p>
+                    </Link>
+                    <button className="py-3 opacity-80 border-2 text-white hover:opacity-100 tracking-widest transition duration-300 px-4 bg-slate-900 rounded-lg font-medium">
+                      Đặt hàng
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </section>
+      </Container>
+    </>
+  );
+};
+
+export default CheckOut;
+
+// const handleProvinceChange = (e) => {
+//   if (e.target.value === "null") {
+//     setSelectedProvince("");
+//   } else {
+//     const provinceId = e.target.value;
+//     setSelectedProvince(provinceId);
+//     setDistricts(Districts[provinceId].data);
+//     setSelectedDistrict("");
+//   }
+// };
+
+// const handleDistrictChange = (e) => {
+//   if (e.target.value === "null") {
+//     setSelectedDistrict("");
+//   } else {
+//     const districtId = e.target.value;
+//     setSelectedDistrict(districtId);
+//   }
+// };
+// <div className="flex flex-col">
+//   <div className="flex justify-between">
+//     <div className="flex gap-3 items-center">
+//       <label
+//         className="font-semibold text-sm text-gray-600 pb-1 block"
+//         htmlFor="checkOut"
+//       >
+//         Tỉnh/Thành phố
+//       </label>
+//       <p className="text-red-600 text-lg">*</p>
+//     </div>
+//     <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+//       {!selectedProvince ? (
+//         <div>{formik.errors.province}</div>
+//       ) : null}
+//     </div>
+//   </div>
+//   <select
+//     onBlur={formik.handleBlur("province")}
+//     value={selectedProvince}
+//     onChange={handleProvinceChange}
+//     className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
+//     name="province" // Đặt name là "province"
+//     placeholder="Tỉnh/Thành phố *"
+//   >
+//     <option value="0">Hà Nội</option>
+//     <option value="1">Bắc Giang</option>
+//     <option value="2">Bắc Ninh</option>
+//   </select>
+// </div>;
+
+// <div className="flex flex-col">
+//   <div className="flex justify-between">
+//     <div className="flex gap-3 items-center">
+//       <label
+//         className="font-semibold text-sm text-gray-600 pb-1 block"
+//         htmlFor="checkOut"
+//       >
+//         Quận/Huyện
+//       </label>
+//       <p className="text-red-600 text-lg">*</p>
+//     </div>
+//     <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+//       {!selectedDistrict ? (
+//         <div>{formik.errors.district}</div>
+//       ) : null}
+//     </div>
+//   </div>
+//   <select
+//     className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
+//     name="district" // Đặt name là "district"
+//     onBlur={formik.handleBlur("district")}
+//     value={selectedDistrict}
+//     onChange={handleDistrictChange}
+//     disabled={!selectedProvince}
+//   >
+//     {districts.map((district) => (
+//       <option key={district.value} value={district.value}>
+//         {district.name}
+//       </option>
+//     ))}
+//   </select>
+// </div>;
+
+// useEffect(() => {
+//   axios
+//     .get("https://vapi.vnappmob.com/api/province/")
+//     .then((response) => {
+//       console.log(response.data);
+//     })
+//     .catch((error) => {
+//       console.error("Lỗi khi lấy dữ liệu: ", error);
+//     });
+// }, []);
+// const handleProvinceChange = (e) => {
+//   if (e.target.value === "null") {
+//     setSelectedProvince("");
+//   } else {
+//     const provinceId = e.target.value;
+//     console.log(provinceId);
+//     setSelectedProvince(provinceId);
+//     axios
+//       .get(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
+//       .then((response) => setDistricts(response.data.results));
+//     setWards([]);
+//     setSelectedDistrict("");
+//     setSelectedWard("");
+//   }
+// };
+// const handleDistrictChange = (e) => {
+//   if (e.target.value === "null") {
+//     setSelectedDistrict("");
+//   } else {
+//     const districtId = e.target.value;
+//     setSelectedDistrict(districtId);
+//     axios
+//       .get(`https://vapi.vnappmob.com/api/province/ward/${districtId}`)
+//       .then((response) => setWards(response.data.results));
+//     setSelectedWard("");
+//   }
+// };
+
+// const handleWardChange = (e) => {
+//   if (e.target.value === "null") {
+//     setSelectedWard("");
+//   } else {
+//     setSelectedWard(e.target.value);
+//   }
+// };
+{
+  /* <select
                       className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
                       name="province"
                       onBlur={formik.handleBlur("province")}
@@ -286,27 +598,10 @@ const CheckOut = () => {
                           {province.province_name}
                         </option>
                       ))}
-                    </select>
-                  </div>
-                  {/* district */}
-                  <div className="flex flex-col">
-                    <div className="flex justify-between">
-                      <div className="flex gap-3 items-center">
-                        <label
-                          className="font-semibold text-sm text-gray-600 pb-1 block"
-                          htmlFor="checkOut"
-                        >
-                          Quận/Huyện
-                        </label>
-                        <p className="text-red-600 text-lg">*</p>
-                      </div>
-                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
-                        {!selectedDistrict ? (
-                          <div>{formik.errors.district}</div>
-                        ) : null}
-                      </div>
-                    </div>
-                    <select
+                    </select> */
+}
+{
+  /* <select
                       className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
                       name="district"
                       onBlur={formik.handleBlur("district")}
@@ -323,10 +618,13 @@ const CheckOut = () => {
                           {district.district_name}
                         </option>
                       ))}
-                    </select>
-                  </div>
-                  {/* ward */}
-                  <div className="flex flex-col">
+                    </select> */
+}
+{
+  /* ward */
+}
+{
+  /* <div className="flex flex-col">
                     <div className="flex justify-between">
                       <div className="flex gap-3 items-center">
                         <label
@@ -357,155 +655,5 @@ const CheckOut = () => {
                           </option>
                         ))}
                     </select>
-                  </div>
-                  <div className="flex flex-col">
-                    <div className="flex justify-between">
-                      <div className="flex gap-3 items-center">
-                        <label
-                          className="font-semibold text-sm text-gray-600 pb-1 block"
-                          htmlFor="checkOut"
-                        >
-                          State
-                        </label>
-                        <p className="text-red-600 text-lg">*</p>
-                      </div>
-                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
-                        {!selectedState ? (
-                          <div>{formik.errors.state}</div>
-                        ) : null}
-                      </div>
-                    </div>
-                    <select
-                      name="state"
-                      onChange={handleStateChange}
-                      onBlur={formik.handleBlur("state")}
-                      value={selectedState}
-                      className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
-                    >
-                      <option value="null">State</option>
-                      <option value="State2">State1</option>
-                      <option value="State2">State2</option>
-                      <option value="State2">State3</option>
-                      <option value="State2">State4</option>
-                    </select>
-                  </div>
-
-                  <div className="mb-4">
-                    <div className="flex justify-between">
-                      <div className="flex gap-3 items-center">
-                        <label
-                          className="font-semibold text-sm text-gray-600 pb-1 block"
-                          htmlFor="checkOut"
-                        >
-                          Name
-                        </label>
-                        <p className="text-red-600 text-lg">*</p>
-                      </div>
-                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
-                        {formik.touched.name && formik.errors.name ? (
-                          <div>{formik.errors.name}</div>
-                        ) : null}
-                      </div>
-                    </div>
-                    <CustomInput
-                      type="text"
-                      name="name"
-                      onChange={formik.handleChange("name")}
-                      onBlur={formik.handleBlur("name")}
-                      value={formik.values.name}
-                      className="w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <div className="flex justify-between">
-                      <div className="flex gap-3 items-center">
-                        <label
-                          className="font-semibold text-sm text-gray-600 pb-1 block"
-                          htmlFor="checkOut"
-                        >
-                          Địa chỉ cụ thể
-                        </label>
-                        <p className="text-red-600 text-lg">*</p>
-                      </div>
-                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
-                        {formik.touched.address && formik.errors.address ? (
-                          <div>{formik.errors.address}</div>
-                        ) : null}
-                      </div>
-                    </div>
-                    <CustomInput
-                      type="text"
-                      name="address"
-                      onChange={formik.handleChange("address")}
-                      onBlur={formik.handleBlur("address")}
-                      value={formik.values.address}
-                      className="w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div className="mb-4">
-                    <div className="flex justify-between">
-                      <div className="flex gap-3 items-center">
-                        <label
-                          className="font-semibold text-sm text-gray-600 pb-1 block"
-                          htmlFor="checkOut"
-                        >
-                          Ghi chú
-                        </label>
-                        <p className="text-red-600 text-lg">*</p>
-                      </div>
-                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
-                        {formik.touched.description &&
-                        formik.errors.description ? (
-                          <div>{formik.errors.description}</div>
-                        ) : null}
-                      </div>
-                    </div>
-                    <textarea
-                      name="description"
-                      onChange={formik.handleChange("description")}
-                      onBlur={formik.handleBlur("description")}
-                      value={formik.values.description}
-                      className="bg-gray-100 w-full text-gray-900 border border-gray-300 rounded-md p-4 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition duration-150"
-                      placeholder="Nhận xét"
-                    ></textarea>
-                  </div>
-                </form>
-                <div className="flex justify-between">
-                  <Link
-                    to="/"
-                    className="flex items-center duration-300 hover:gap-2 hover:-translate-x-3 justify-center gap-2 tracking-widest p-3 opacity-80 
-                    border-2 text-gray-900 hover:opacity-100 hover:border-red-500 px-4 bg-white rounded-lg font-medium"
-                  >
-                    <svg
-                      className="w-5 h-5 rotate-180"
-                      stroke="currentColor"
-                      strokeWidth="1.5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                        strokeLinejoin="round"
-                        strokeLinecap="round"
-                      ></path>
-                    </svg>
-                    <p>Quay lại</p>
-                  </Link>
-                  <Link
-                    to="/checkout"
-                    className="py-3 opacity-80 border-2 text-white hover:opacity-100 tracking-widest transition duration-300 px-4 bg-slate-900 rounded-lg font-medium"
-                  >
-                    Đặt hàng
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </Container>
-    </>
-  );
-};
-
-export default CheckOut;
+                  </div> */
+}

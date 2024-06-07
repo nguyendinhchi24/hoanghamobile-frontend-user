@@ -25,6 +25,17 @@ export const getAProduct = createAsyncThunk(
     }
   }
 );
+export const getSearchProducts = createAsyncThunk(
+  "product/getSearchProducts",
+  async (keyword, thunkAPI) => {
+    try {
+      const products = await productService.getSearchProducts(keyword);
+      return products;
+    } catch (e) {
+      return thunkAPI.rejectWithValue(e);
+    }
+  }
+);
 
 export const addToWishList = createAsyncThunk(
   "product/wishlist",
@@ -91,6 +102,21 @@ export const productSlice = createSlice({
         state.addToWishList = action.payload;
       })
       .addCase(addToWishList.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.isSuccess = false;
+        state.message = action.error.message;
+      })
+      .addCase(getSearchProducts.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getSearchProducts.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isError = false;
+        state.isSuccess = true;
+        state.getSearchProducts = action.payload;
+      })
+      .addCase(getSearchProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.isSuccess = false;

@@ -7,7 +7,6 @@ import { PropTypes } from "prop-types";
 const ProductList = ({ grid, number }) => {
   const dispatch = useDispatch();
   const productState = useSelector((state) => state.product.products);
-
   useEffect(() => {
     dispatch(getAllProducts());
   }, [dispatch]);

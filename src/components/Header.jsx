@@ -6,11 +6,12 @@ import {
   ChevronDownIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-
+import { Dropdown } from "antd";
 import data from "./data.json";
 import CustomInput from "./CustomInput";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserCart, resetState } from "../features/user/userSlice";
+import SearchInput from "./SearchInput";
 
 const products = data;
 function classNames(...classes) {
@@ -31,6 +32,7 @@ export default function Example() {
     (total, item) => total + item.productId.price * item.quantity,
     0
   );
+
   useEffect(() => {
     dispatch(getUserCart());
     dispatch(resetState());
@@ -45,6 +47,30 @@ export default function Example() {
   const handleItemClick = () => {
     setIsOpen(false);
   };
+  const items = [
+    {
+      key: "1",
+      label: (
+        <Link
+          to={authState && authState?.user === null ? "/login" : "/my-orders"}
+          target="_blank"
+        >
+          My Order
+        </Link>
+      ),
+    },
+    {
+      key: "2",
+      label: (
+        <Link
+          to={authState && authState?.user === null ? "/login" : "/my-orders"}
+          target="_blank"
+        >
+          Log out
+        </Link>
+      ),
+    },
+  ];
   return (
     <>
       <header
@@ -70,7 +96,8 @@ export default function Example() {
 
           {/* inputsearch */}
           <div className="max-sm:hidden lg:flex-1 lg:justify-end items-center">
-            <div className="flex max-w-[310px] pr-3 items-center space-x-2">
+            <SearchInput />
+            {/* <div className="flex max-w-[310px] pr-3 items-center space-x-2">
               <CustomInput
                 className="focus:outline-none flex h-[32px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-[15px] placeholder-gray-500 focus:ring-1 focus:ring-slate-900 focus:border-transparent"
                 type="search"
@@ -92,7 +119,7 @@ export default function Example() {
                   />
                 </svg>
               </button>
-            </div>
+            </div> */}
           </div>
 
           {/* Bars3Icon reponsive */}
@@ -169,17 +196,29 @@ export default function Example() {
             >
               <span>Liên hệ </span>
             </Link>
-            <Link
-              to={authState && authState?.user === null ? "/login" : "/"}
-              href="#"
-              className="text-[15px] font-semibold leading-6 hover:text-cyan-900 text-black outline-none"
-            >
+            <div className="text-[15px] font-semibold leading-6 hover:text-cyan-900 text-black outline-none">
               {authState && authState?.user === null ? (
-                <span>Đăng nhập</span>
+                <Link
+                  to={
+                    authState && authState?.user === null
+                      ? "/login"
+                      : "/my-orders"
+                  }
+                >
+                  Đăng nhập
+                </Link>
               ) : (
-                <span>{authState?.user?.name}</span>
+                <Dropdown
+                  menu={{
+                    items,
+                  }}
+                  placement="bottom"
+                  arrow
+                >
+                  <span>{authState?.user?.name}</span>
+                </Dropdown>
               )}
-            </Link>
+            </div>
 
             {/* cart */}
             <div className="text-[15px] font-semibold leading-6  text-black outline-none">

@@ -28,6 +28,7 @@ import { toast } from "react-toastify";
 import ColorComponent from "../components/ColorComponent";
 import { addProdToCart } from "../features/user/userSlice";
 import { getUserCart } from "../features/user/userSlice";
+import LoadingComponent from "./LoadingComponent";
 
 const slides = [
   {
@@ -59,19 +60,33 @@ const SingleProduct = () => {
   const location = useLocation();
   const [color, setColor] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [orderedProduct, setorderedProduct] = useState(true);
+  const [orderedProduct, setOrderedProduct] = useState(false);
   const [selectedSlide, setSelectedSlide] = useState(0);
   const [expanded, setExpanded] = useState(false);
   const [alreadyAdded, setAlreadyAdded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const getProductId = location.pathname.split("/")[2];
   const productState = useSelector((state) => state.product.singleProduct);
   const cartState = useSelector((state) => state.auth.cartProducts);
 
+  const handleShowComment = () => {
+    if (orderedProduct === false) {
+      setOrderedProduct(true);
+    } else {
+      setOrderedProduct(false);
+    }
+  };
   useEffect(() => {
+    setIsLoading(true);
     dispatch(getAProduct(getProductId));
     dispatch(getUserCart());
-  }, [dispatch]);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [dispatch, getProductId]);
 
   useEffect(() => {
     if (cartState && getProductId) {
@@ -109,9 +124,10 @@ const SingleProduct = () => {
     setExpanded(isExpanded ? panel : false);
   };
 
-  const copyToClipboard = (panel) => {
+  const copyToClipboard = () => {
     var textField = document.createElement("textarea");
-    textField.innerHTML = panel;
+    textField.innerHTML = window.location.href;
+    // textField.innerHTML = panel;
     document.body.appendChild(textField);
     textField.select();
     document.execCommand("copy");
@@ -125,6 +141,10 @@ const SingleProduct = () => {
       currency: "VND",
     }).format(amount);
   };
+  if (isLoading) {
+    return <LoadingComponent />;
+  }
+
   return (
     <>
       <Meta title={productState?.title ? productState?.title : "Product"} />
@@ -181,9 +201,12 @@ const SingleProduct = () => {
               <div className="space-y-6">
                 <div className="space-y-1">
                   <h3 className="text-3xl font-bold">{productState?.title}</h3>
-                  <h3 className="text-xl text-red-600 font-bold pt-3 px-3 underline">
-                    {formatCurrency(productState?.price)}
-                  </h3>
+                  <div className=" flex items-center gap-3 text-xl  font-bold pt-3 px-3 ">
+                    <h3>Giá: </h3>
+                    <h3 className="text-red-600 underline">
+                      {formatCurrency(productState?.price)}
+                    </h3>
+                  </div>
                 </div>
                 <div className="flex items-center justify-between text-gray-500 ">
                   <div className="flex items-center space-x-3">
@@ -296,7 +319,7 @@ const SingleProduct = () => {
                         Product Link:
                       </p>
                       <a
-                        href="javascript:void(0)"
+                        href="#"
                         onClick={() => {
                           copyToClipboard(window.location.href);
                         }}
@@ -419,7 +442,10 @@ const SingleProduct = () => {
                       4 out of 5
                     </p>
                   </div>
-                  <button className="hover:underline text-sm font-medium text-gray-500 ">
+                  <button
+                    onClick={() => handleShowComment()}
+                    className="hover:underline text-sm font-medium text-gray-500 "
+                  >
                     Write a reviews
                   </button>
                 </div>
@@ -495,10 +521,26 @@ const SingleProduct = () => {
                           placeholder="Write your comments here..."
                         ></textarea>
                       </div>
-                      <div className="text-right px-5 py-3">
-                        <button className="bg-gray-100 text-gray-600 border border-gray-400 border-b-4 font-medium overflow-hidden relative px-4 py-2 rounded-md hover:bg-gray-200 hover:border-t-4 hover:border-b active:opacity-75 outline-none duration-300 group">
-                          <span className="bg-gray-400 shadow-gray-400 absolute -top-[150%] left-0 inline-flex w-80 h-[5px] rounded-md opacity-50 group-hover:top-[150%] duration-500 shadow-[0_0_10px_10px_rgba(0,0,0,0.3)]"></span>
-                          Submit Review
+                      <div className="w-full flex justify-end px-5 py-3">
+                        <button
+                          className=" flex items-center duration-300 hover:gap-2 hover:-translate-x-3 justify-center gap-2 tracking-widest p-3 opacity-80 
+                      border-2 text-gray-900 w-[230px] hover:opacity-100 hover:border-red-500 px-4 bg-white rounded-lg font-medium"
+                        >
+                          <svg
+                            className="w-5 h-5 rotate-180"
+                            stroke="currentColor"
+                            strokeWidth="1.5"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                              strokeLinejoin="round"
+                              strokeLinecap="round"
+                            ></path>
+                          </svg>
+                          <p>Submit Review</p>
                         </button>
                       </div>
                     </div>

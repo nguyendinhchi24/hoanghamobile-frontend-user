@@ -1,6 +1,17 @@
 import PropTypes from "prop-types";
+import { toast } from "react-toastify";
 
 const ColorComponent = ({ data, setColor }) => {
+  const bgColor = (title) => {
+    if (title.toLowerCase() === "black") {
+      return "bg-black";
+    } else if (title.toLowerCase() === "white") {
+      return "bg-white";
+    } else {
+      return `bg-${title.toLowerCase()}-600`;
+    }
+  };
+
   return (
     <>
       <ul className="flex items-center space-x-2">
@@ -9,13 +20,13 @@ const ColorComponent = ({ data, setColor }) => {
             return (
               <li
                 key={index}
-                onClick={() => setColor(item?._id)}
-                className={`w-6 h-6 border border-gray-500 bg-${
-                  item?.title.toLowerCase() === "black" ||
-                  item?.title.toLowerCase() === "white"
-                    ? item?.title.toLowerCase()
-                    : item?.title.toLowerCase() + "-600"
-                } rounded-full`}
+                onClick={() => {
+                  setColor(item?._id);
+                  toast.success(`Đã chọn màu ${item?.title}`);
+                }}
+                className={`w-6 h-6 border border-gray-500 ${bgColor(
+                  item?.title
+                )} rounded-full`}
               />
             );
           })}

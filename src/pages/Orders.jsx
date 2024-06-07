@@ -8,9 +8,7 @@ import { Fragment } from "react";
 
 const Orders = () => {
   const dispatch = useDispatch();
-  const orderState = useSelector((state) => state.auth.getOrderProduct) || [];
-
-  console.log(orderState);
+  const orderState = useSelector((state) => state.auth.getOrderProduct);
 
   useEffect(() => {
     dispatch(getOrders());

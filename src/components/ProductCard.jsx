@@ -1,11 +1,10 @@
 import { useDispatch } from "react-redux";
 import { addToWishList } from "../features/products/productSlice";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Checkbox, IconButton, Tooltip } from "@mui/material";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import Rating from "@mui/material/Rating";
 import PropTypes from "prop-types";
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import CompareArrowsOutlinedIcon from "@mui/icons-material/CompareArrowsOutlined";
 import images from "../assets";
@@ -62,16 +61,36 @@ const ProductCard = ({ data, grid }) => {
               }}
               className="absolute z-8 text-lg right-1 top-1 cursor-pointer"
             >
-              <Tooltip title="Like" placement="left-start">
-                <IconButton>
-                  <Checkbox
-                    icon={<FavoriteBorder />}
-                    checkedIcon={<Favorite className="text-red-500" />}
-                    // Sử dụng trạng thái liked từ localStorage
-                    checked={!!likedItems[item._id]}
-                  />
-                </IconButton>
-              </Tooltip>
+              <div className="flex flex-col">
+                <Tooltip title="Like" placement="left-start">
+                  <IconButton>
+                    <Checkbox
+                      icon={<FavoriteBorder />}
+                      checkedIcon={<Favorite className="text-red-500" />}
+                      // Sử dụng trạng thái liked từ localStorage
+                      checked={!!likedItems[item._id]}
+                    />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Mua ngay" placement="left-start">
+                  <IconButton
+                    onClick={(e) => {
+                      handleNavigation(e, item?._id);
+                    }}
+                  >
+                    <ShoppingBagOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="So sánh" placement="left-start">
+                  <IconButton
+                    onClick={() => {
+                      navigate("/compare-product");
+                    }}
+                  >
+                    <CompareArrowsOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              </div>
             </div>
             <div className="flex justify-center items-center bg-white pointer-events-none">
               <img
@@ -80,15 +99,13 @@ const ProductCard = ({ data, grid }) => {
                 className="object-cover h-48 w-full md:h-full md:w-48 pointer-events-none transition duration-300"
               />
             </div>
-            <Link
-              to={`${
-                location.pathname !== "/"
-                  ? "/product/:id"
-                  : location.pathname == "/product/:id"
-                  ? "/product/:id"
-                  : ":id"
-              }`}
-              className={`${grid === 12 ? "" : "border-t"} p-4 w-full`}
+            <div
+              onClick={(e) => {
+                handleNavigation(e, item?._id);
+              }}
+              className={`${
+                grid === 12 ? "" : "border-t"
+              } p-4 w-full cursor-pointer`}
             >
               <p className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">
                 {item.brand}
@@ -109,39 +126,6 @@ const ProductCard = ({ data, grid }) => {
               <p className="text-slate-500 overflow-hidden whitespace-nowrap text-ellipsis">
                 {item.description}
               </p>
-            </Link>
-            <div className="absolute top-12 right-3">
-              <div className="flex flex-col">
-                <button
-                  onClick={() => {
-                    navigate("/compare-product");
-                  }}
-                >
-                  <Tooltip title="So sánh" placement="left-start">
-                    <IconButton>
-                      <CompareArrowsOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                </button>
-                <button
-                  onClick={(e) => {
-                    handleNavigation(e, item?._id);
-                  }}
-                >
-                  <Tooltip title="Xem chi tiết" placement="left-start">
-                    <IconButton>
-                      <RemoveRedEyeIcon />
-                    </IconButton>
-                  </Tooltip>
-                </button>
-                <Link to="/product/:id">
-                  <Tooltip title="Thêm vào giỏ hàng" placement="left-start">
-                    <IconButton>
-                      <ShoppingBagOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Link>
-              </div>
             </div>
           </div>
         </div>
