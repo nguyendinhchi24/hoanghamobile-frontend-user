@@ -63,7 +63,7 @@ export default function Example() {
       key: "2",
       label: (
         <Link
-          to={authState && authState?.user === null ? "/login" : "/my-orders"}
+          to={authState && authState?.user === null ? "/login" : "/"}
           target="_blank"
         >
           Log out
@@ -196,7 +196,7 @@ export default function Example() {
             >
               <span>Liên hệ </span>
             </Link>
-            <div className="text-[15px] font-semibold leading-6 hover:text-cyan-900 text-black outline-none">
+            <div className="text-[15px] font-semibold leading-6 hover:text-cyan-900 cursor-pointer text-black outline-none">
               {authState && authState?.user === null ? (
                 <Link
                   to={

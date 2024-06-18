@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import Marquee from "react-fast-marquee";
 import BlogCard from "../components/BlogCard";
 import category from "./anh1.png";
@@ -21,6 +20,9 @@ import moment from "moment";
 import ProductList from "../components/ProductList";
 import { getAllProducts } from "../features/products/productSlice";
 import { getUserCart } from "../features/user/userSlice";
+import Meta from "../components/Meta";
+import BreadCrumb from "../components/BreadCrumb";
+import { Link } from "react-router-dom";
 
 const iconMap = {
   FaShippingFast: FaShippingFast,
@@ -42,42 +44,43 @@ const Home = () => {
 
   return (
     <>
+      <Meta title={"Hoàng Hà Mobile"} />
+      <BreadCrumb />
+
       {/* slider */}
       <Container>
         <section className="p-5 ">
           <div className="bg-white p-5 rounded-md grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <div className="md:col-span-2 lg:col-span-2 xl:col-span-3">
+            <div className="md:col-span-2 lg:col-span-2 xl:col-span-4">
               {/* slider */}
               <div className="group relative">
                 <img
-                  src="https://th.bing.com/th/id/R.d4714a8804369bb03d92649315b2f1d2?rik=8S4WWCxl67NsaQ&pid=ImgRaw&r=0"
-                  className="w-full h-[640px] object-cover transition-opacity duration-300 rounded-lg max-ms-h-full max-ms-w-full"
+                  src="https://cdn.hoanghamobile.com/i/home/Uploads/2024/06/08/xiaomi-redmi-12-web.png"
+                  className="w-full h-auto object-cover transition-opacity duration-300 rounded-lg max-h-full max-w-full"
                   alt="Xiaomi RedMi"
                 />
 
-                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div
-                    className="bg-white items-center rounded-lg 
-                  hover:backdrop-filter hover:backdrop-blur-lg 
-                  flex justify-center bg-opacity-80 absolute
-                  bottom-0 left-0 w-full h-full lg:w-2/4 lg:h-2/4"
-                  >
-                    <div className="relative z-10">
-                      <h4 className="text-black text-base md:text-xl uppercase font-semibold tracking-[1px] mb-2">
-                        Xiaomi RedMi
-                      </h4>
-                      <h1 className="text-black text-lg md:text-2xl lg:text-4xl font-semibold py-1 lg:py-4">
+                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black bg-opacity-50">
+                  <div className="bg-white rounded-lg shadow-lg hover:shadow-2xl flex flex-col justify-center items-center bg-opacity-80 w-full lg:w-2/4 p-6 transform translate-y-16 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-transform duration-300">
+                    <div className="relative z-10 text-center">
+                      <h1 className="text-black text-2xl lg:text-4xl font-semibold py-1 lg:py-4">
                         Xiaomi RedMi Note 11 Pro 5G
                       </h1>
                       <div className="flex items-center py-1 lg:py-4">
-                        <strong className="text-sm md:text-base lg:text-xl text-red-500 mr-2 underline">
+                        <strong className="text-lg text-red-500 mr-2 underline">
                           Giá: 5.500.000 VNĐ
                         </strong>
-                        <p className="text-red-500 line-through text-sm md:text-base mt-2">
+                        <p className="text-red-500 line-through text-lg mt-2">
                           8.500.000 đ
                         </p>
                       </div>
-                      <button className="text-white bg-slate-900  opacity-80 hover:opacity-100 text-center py-2 px-6 rounded-full font-semibold transition duration-300">
+                      <p className="text-sm text-gray-700 mb-2">
+                        Giảm giá: 35%
+                      </p>
+                      <p className="text-sm text-gray-700 mb-4">
+                        Khuyến mãi: Tặng kèm tai nghe Bluetooth
+                      </p>
+                      <button className="text-white bg-slate-900 hover:bg-red-500 hover:text-white py-2 px-6 rounded-full font-semibold transition duration-300">
                         Mua Ngay
                       </button>
                     </div>
@@ -88,36 +91,43 @@ const Home = () => {
 
             {/* image small */}
             <div className="md:col-span-2 lg:col-span-1 xl:col-span-1 ">
-              <div className="grid md:grid-cols-2 lg:grid-cols-1 gap-4 scroll-smooth overflow-hidden lg:overflow-auto lg:max-h-[640px]">
-                {/* render */}
-                {[...Array(5)].map((_, index) => (
-                  <div className="relative" key={index}>
-                    <img
-                      src="https://th.bing.com/th/id/R.d4714a8804369bb03d92649315b2f1d2?rik=8S4WWCxl67NsaQ&pid=ImgRaw&r=0"
-                      className="rounded-lg h-full w-full object-cover"
-                      alt=""
-                    />
-                    <div className="absolute inset-0 bg-opacity-40 hover:bg-opacity-0 hover:backdrop-filter hover:backdrop-blur-lg p-6 rounded-lg transition duration-300 opacity-0 hover:opacity-100 flex flex-col items-center justify-center">
-                      <h4 className="text-xs md:text-sm text-white uppercase font-semibold tracking-[1px]">
-                        Xiaomi RedMi
-                      </h4>
-                      <h1 className="text-sm md:text-xl text-slate-900 font-semibold py-1 text-center">
-                        Xiaomi RedMi Note 11 Pro 5G
-                      </h1>
-                      <div className="flex items-center py-2">
-                        <strong className="text-base md:text-lg text-red-500 mr-2 underline">
-                          Giá: 5.500.000 VNĐ
-                        </strong>
-                        <p className="text-white mt-1 line-through text-sm md:text-sm self-end">
-                          8.500.000 VNĐ
-                        </p>
+              <div className="flex">
+                <div className="flex gap-6 justify-center items-center">
+                  {[...Array(4)].map((_, index) => (
+                    <div
+                      className="relative w-[330px] mx-auto border-2 border-gray-300 rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
+                      key={index}
+                    >
+                      <img
+                        src="https://cdn.hoanghamobile.com/i/productlist/ts/Uploads/2023/07/18/13-removebg-preview.png"
+                        className="w-full h-72 object-contain bg-white"
+                        alt=""
+                      />
+                      <div className="p-4">
+                        <h4 className="text-sm text-gray-700 uppercase font-semibold tracking-wide">
+                          Xiaomi RedMi
+                        </h4>
+                        <h1 className="text-lg text-gray-900 font-bold py-2">
+                          Xiaomi RedMi Note 11 Pro 5G
+                        </h1>
+                        <div className="flex items-center justify-between py-2">
+                          <strong className="text-xl text-red-500 underline">
+                            5.500.000 VNĐ
+                          </strong>
+                          <p className="text-gray-500 line-through">
+                            8.500.000 VNĐ
+                          </p>
+                        </div>
+                        <Link
+                          to="/product"
+                          className="block w-full text-center py-3 mt-4 bg-red-500 text-white rounded-lg font-semibold transition duration-300 hover:bg-red-600"
+                        >
+                          Buy Now
+                        </Link>
                       </div>
-                      <Link className="text-white md:text-xs bg-slate-900 text-center py-3 px-10 rounded-2xl font-semibold opacity-90 hover:opacity-100">
-                        Buy Now
-                      </Link>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>

@@ -9,7 +9,8 @@ import CustomInput from "../components/CustomInput";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { getUserCart } from "../features/user/userSlice";
+import { checkOut, getUserCart } from "../features/user/userSlice";
+import axios from "axios";
 
 let Districts = [
   {
@@ -90,11 +91,89 @@ let checkOutSchema = Yup.object({
 const CheckOut = () => {
   const [selectedState, setSelectedState] = useState("");
   const [total, setTotal] = useState(0);
-  const [items, setItems] = useState([]);
+  // const [items, setItems] = useState([]);
   const shippingFee = 30000;
   const dispatch = useDispatch();
   const cartState = useSelector((state) => state.auth.cartProducts) || [];
   const userState = useSelector((state) => state.auth.user) || [];
+  // const [carts, setCarts] = useState([
+  //   {
+  //     id: "222",
+  //     totalPrice: 9999,
+  //     products: [
+  //       {
+  //         id: "204727",
+  //         name: "YOMOST Bac Ha&Viet Quat 170ml",
+  //         description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
+  //         category: "beverage",
+  //         imageUrl: "https://momo.vn/uploads/product1.jpg",
+  //         manufacturer: "Vinamilk",
+  //         price: 1,
+  //         quantity: 1,
+  //         unit: "hộp",
+  //         totalPrice: 10000,
+  //         taxAmount: "200",
+  //       },
+  //       {
+  //         id: "204727",
+  //         name: "YOMOST Bac Ha&Viet Quat 170ml",
+  //         description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
+  //         category: "beverage",
+  //         imageUrl: "https://momo.vn/uploads/product1.jpg",
+  //         manufacturer: "Vinamilk",
+  //         price: 1,
+  //         quantity: 1,
+  //         unit: "hộp",
+  //         totalPrice: 10000,
+  //         taxAmount: "200",
+  //       },
+  //     ],
+  //   },
+  // ]);
+
+  // const [userInfo, setUserInfo] = useState({
+  //   name: "Nguyen Van A",
+  //   phoneNumber: "0999888999",
+  //   email: "email_add@domain.com",
+  // });
+
+  const handleCheckout = (values) => {
+    const endpoint = values.state === "momo" ? "checkout" : "create-order";
+
+    // Build the correct payload format
+    const payload = {
+      carts: [
+        {
+          id: "222",
+          totalPrice: 9999,
+          products: [
+            {
+              id: "204727",
+              name: "YOMOST Bac Ha&Viet Quat 170ml",
+              description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
+              category: "beverage",
+              imageUrl: "https://momo.vn/uploads/product1.jpg",
+              manufacturer: "Vinamilk",
+              price: 1,
+              quantity: 1,
+              unit: "hộp",
+              totalPrice: 10000,
+              taxAmount: "200",
+            },
+          ],
+        },
+      ],
+      userInfo: {
+        name: "Nguyen Van A",
+        phone: "0999888999",
+        email: "email_add@domain.com",
+      },
+    };
+
+    if (endpoint === "checkout") {
+      dispatch(checkOut(payload));
+    }
+  };
 
   useEffect(() => {
     dispatch(getUserCart());
@@ -110,47 +189,6 @@ const CheckOut = () => {
     }
   }, [cartState]);
 
-  const handlePayment = async (values) => {
-    console.log("submit", values);
-    // try {
-    //   const response = await axios.post("http://localhost:5000/payment", {
-    //     items: [
-    //       {
-    //         id: "204727",
-    //         name: "YOMOST Bac Ha&Viet Quat 170ml",
-    //         description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
-    //         category: "beverage",
-    //         imageUrl: "https://momo.vn/uploads/product1.jpg",
-    //         manufacturer: "Vinamilk",
-    //         price: 11000,
-    //         quantity: 5,
-    //         unit: "hộp",
-    //         totalPrice: 55000,
-    //         taxAmount: "200",
-    //       },
-    //     ],
-    //     userInfo: {
-    //       name: "Nguyen Van A",
-    //       phoneNumber: "0999888999",
-    //       email: "email_add@domain.com",
-    //     },
-    //     accessKey: "F8BBA842ECF85",
-    //     secretKey: "K951B6PE1waDMi640xX08PD3vg6EkVlz",
-    //     partnerCode: "MOMO",
-    //     redirectUrl: "http://localhost:3000/success",
-    //     ipnUrl: "https://ed1a-171-224-28-242.ngrok-free.app/callback",
-    //     requestType: "payWithMethod",
-    //     extraData: "eyJ1c2VybmFtZSI6ICJtb21vIn0",
-    //     orderGroupId: "",
-    //     autoCapture: true,
-    //     lang: "vi",
-    //   });
-    //   setShippingInfo(response.data);
-    // } catch (error) {
-    //   console.error("Error during payment:", error);
-    // }
-  };
-
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -160,8 +198,7 @@ const CheckOut = () => {
     },
     validationSchema: checkOutSchema,
     onSubmit: (values) => {
-      console.log("addd", values);
-      handlePayment(values);
+      handleCheckout(values);
     },
   });
   const handleStateChange = (e) => {
@@ -452,208 +489,3 @@ const CheckOut = () => {
 };
 
 export default CheckOut;
-
-// const handleProvinceChange = (e) => {
-//   if (e.target.value === "null") {
-//     setSelectedProvince("");
-//   } else {
-//     const provinceId = e.target.value;
-//     setSelectedProvince(provinceId);
-//     setDistricts(Districts[provinceId].data);
-//     setSelectedDistrict("");
-//   }
-// };
-
-// const handleDistrictChange = (e) => {
-//   if (e.target.value === "null") {
-//     setSelectedDistrict("");
-//   } else {
-//     const districtId = e.target.value;
-//     setSelectedDistrict(districtId);
-//   }
-// };
-// <div className="flex flex-col">
-//   <div className="flex justify-between">
-//     <div className="flex gap-3 items-center">
-//       <label
-//         className="font-semibold text-sm text-gray-600 pb-1 block"
-//         htmlFor="checkOut"
-//       >
-//         Tỉnh/Thành phố
-//       </label>
-//       <p className="text-red-600 text-lg">*</p>
-//     </div>
-//     <div className="error text-red-500 text-sm p-0 m-0 font-medium">
-//       {!selectedProvince ? (
-//         <div>{formik.errors.province}</div>
-//       ) : null}
-//     </div>
-//   </div>
-//   <select
-//     onBlur={formik.handleBlur("province")}
-//     value={selectedProvince}
-//     onChange={handleProvinceChange}
-//     className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
-//     name="province" // Đặt name là "province"
-//     placeholder="Tỉnh/Thành phố *"
-//   >
-//     <option value="0">Hà Nội</option>
-//     <option value="1">Bắc Giang</option>
-//     <option value="2">Bắc Ninh</option>
-//   </select>
-// </div>;
-
-// <div className="flex flex-col">
-//   <div className="flex justify-between">
-//     <div className="flex gap-3 items-center">
-//       <label
-//         className="font-semibold text-sm text-gray-600 pb-1 block"
-//         htmlFor="checkOut"
-//       >
-//         Quận/Huyện
-//       </label>
-//       <p className="text-red-600 text-lg">*</p>
-//     </div>
-//     <div className="error text-red-500 text-sm p-0 m-0 font-medium">
-//       {!selectedDistrict ? (
-//         <div>{formik.errors.district}</div>
-//       ) : null}
-//     </div>
-//   </div>
-//   <select
-//     className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
-//     name="district" // Đặt name là "district"
-//     onBlur={formik.handleBlur("district")}
-//     value={selectedDistrict}
-//     onChange={handleDistrictChange}
-//     disabled={!selectedProvince}
-//   >
-//     {districts.map((district) => (
-//       <option key={district.value} value={district.value}>
-//         {district.name}
-//       </option>
-//     ))}
-//   </select>
-// </div>;
-
-// useEffect(() => {
-//   axios
-//     .get("https://vapi.vnappmob.com/api/province/")
-//     .then((response) => {
-//       console.log(response.data);
-//     })
-//     .catch((error) => {
-//       console.error("Lỗi khi lấy dữ liệu: ", error);
-//     });
-// }, []);
-// const handleProvinceChange = (e) => {
-//   if (e.target.value === "null") {
-//     setSelectedProvince("");
-//   } else {
-//     const provinceId = e.target.value;
-//     console.log(provinceId);
-//     setSelectedProvince(provinceId);
-//     axios
-//       .get(`https://vapi.vnappmob.com/api/province/district/${provinceId}`)
-//       .then((response) => setDistricts(response.data.results));
-//     setWards([]);
-//     setSelectedDistrict("");
-//     setSelectedWard("");
-//   }
-// };
-// const handleDistrictChange = (e) => {
-//   if (e.target.value === "null") {
-//     setSelectedDistrict("");
-//   } else {
-//     const districtId = e.target.value;
-//     setSelectedDistrict(districtId);
-//     axios
-//       .get(`https://vapi.vnappmob.com/api/province/ward/${districtId}`)
-//       .then((response) => setWards(response.data.results));
-//     setSelectedWard("");
-//   }
-// };
-
-// const handleWardChange = (e) => {
-//   if (e.target.value === "null") {
-//     setSelectedWard("");
-//   } else {
-//     setSelectedWard(e.target.value);
-//   }
-// };
-{
-  /* <select
-                      className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
-                      name="province"
-                      onBlur={formik.handleBlur("province")}
-                      value={selectedProvince}
-                      onChange={handleProvinceChange}
-                    >
-                      <option value="null">Tỉnh/Thành phố *</option>
-                      {provinces.map((province) => (
-                        <option
-                          key={province.province_id}
-                          value={province.province_id}
-                        >
-                          {province.province_name}
-                        </option>
-                      ))}
-                    </select> */
-}
-{
-  /* <select
-                      className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
-                      name="district"
-                      onBlur={formik.handleBlur("district")}
-                      value={selectedDistrict}
-                      onChange={handleDistrictChange}
-                      disabled={!selectedProvince}
-                    >
-                      <option value="null">Quận/Huyện</option>
-                      {districts.map((district) => (
-                        <option
-                          key={district.district_id}
-                          value={district.district_id}
-                        >
-                          {district.district_name}
-                        </option>
-                      ))}
-                    </select> */
-}
-{
-  /* ward */
-}
-{
-  /* <div className="flex flex-col">
-                    <div className="flex justify-between">
-                      <div className="flex gap-3 items-center">
-                        <label
-                          className="font-semibold text-sm text-gray-600 pb-1 block"
-                          htmlFor="checkOut"
-                        >
-                          Xã/Phường/Thị trấn
-                        </label>
-                        <p className="text-red-600 text-lg">*</p>
-                      </div>
-                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
-                        {!selectedWard ? <div>{formik.errors.ward}</div> : null}
-                      </div>
-                    </div>
-                    <select
-                      className="block w-full px-4 py-2 text-gray-500 mb-2 bg-gray-100 outline-none border rounded"
-                      name="word"
-                      onBlur={formik.handleBlur("word")}
-                      value={selectedWard}
-                      onChange={handleWardChange}
-                      disabled={!selectedDistrict}
-                    >
-                      <option value="null">Xã/Phường/Thị trấn</option>
-                      {selectedDistrict &&
-                        wards.map((ward) => (
-                          <option key={ward.ward_id} value={ward.ward_id}>
-                            {ward.ward_name}
-                          </option>
-                        ))}
-                    </select>
-                  </div> */
-}

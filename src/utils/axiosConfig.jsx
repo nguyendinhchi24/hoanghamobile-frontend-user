@@ -1,3 +1,4 @@
+// export const base_url = "https://hoanghamobile-be.netlify.app/";
 export const base_url = "http://localhost:3000/api/";
 
 const getTokenFromLocalStorage = localStorage.getItem("customer")

@@ -39,7 +39,7 @@ const MyComponent = ({ title }) => (
 );
 
 MyComponent.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
 };
 
 export default MyComponent;

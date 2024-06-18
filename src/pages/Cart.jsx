@@ -27,6 +27,7 @@ const Cart = () => {
   const [productUpdateDetail, setProductUpdateDetail] = useState({});
   const navigate = useNavigate();
   const [total, setTotal] = useState(0);
+  const [quantity, setQuantity] = useState(0);
   const shippingFee = 30000;
 
   useEffect(() => {
@@ -53,7 +54,12 @@ const Cart = () => {
         (acc, item) => acc + item?.productId.price * item?.quantity,
         0
       );
+      const quantity = userCartState.reduce(
+        (acc, item) => acc + item?.quantity,
+        0
+      );
       setTotal(totalAmount);
+      setQuantity(quantity);
     }
   }, [userCartState]);
 
@@ -202,7 +208,13 @@ const Cart = () => {
                 <TableRow>
                   <TableCell rowSpan={4} />
                   <TableCell>Tổng tiền hàng</TableCell>
-                  <TableCell align="right"></TableCell>
+                  <TableCell align="right">
+                    <div className="w-full flex justify-end">
+                      <p className="text-red-500 font-bold text-base px-2 bg-gray-100 border w-10 text-center rounded-md">
+                        {quantity}
+                      </p>
+                    </div>
+                  </TableCell>
                   <TableCell align="right">{formatCurrency(total)}</TableCell>
                 </TableRow>
 

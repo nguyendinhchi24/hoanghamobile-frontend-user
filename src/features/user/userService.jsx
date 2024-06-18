@@ -69,6 +69,22 @@ const createOrder = async (orderDetail) => {
   }
 };
 
+const checkOut = async (payload) => {
+  try {
+    const response = await axios.post(
+      `${base_url}user/order/checkout`,
+      payload,
+      config
+    );
+    if (response.status === 200) {
+      return response.data;
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 const getUserOrders = async () => {
   const response = await axios.get(`${base_url}user/getmyorders`, config);
   if (response.data) {
@@ -86,4 +102,5 @@ export const authService = {
   removeProductFromCart,
   updateProductFromCart,
   getUserOrders,
+  checkOut,
 };
