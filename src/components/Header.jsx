@@ -10,7 +10,11 @@ import { Dropdown } from "antd";
 import data from "./data.json";
 import CustomInput from "./CustomInput";
 import { useDispatch, useSelector } from "react-redux";
-import { getUserCart, resetState } from "../features/user/userSlice";
+import {
+  getUserCart,
+  logOutUser,
+  resetState,
+} from "../features/user/userSlice";
 import SearchInput from "./SearchInput";
 
 const products = data;
@@ -47,28 +51,23 @@ export default function Example() {
   const handleItemClick = () => {
     setIsOpen(false);
   };
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.reload();
+    dispatch(logOutUser());
+  };
   const items = [
     {
       key: "1",
-      label: (
-        <Link
-          to={authState && authState?.user === null ? "/login" : "/my-orders"}
-          target="_blank"
-        >
-          My Order
-        </Link>
-      ),
+      label: <Link to="/my-profile">My Profile</Link>,
     },
     {
       key: "2",
-      label: (
-        <Link
-          to={authState && authState?.user === null ? "/login" : "/"}
-          target="_blank"
-        >
-          Log out
-        </Link>
-      ),
+      label: <Link to="/my-orders">My Order</Link>,
+    },
+    {
+      key: "3",
+      label: <button onClick={handleLogout}>Log out</button>,
     },
   ];
   return (
@@ -97,29 +96,6 @@ export default function Example() {
           {/* inputsearch */}
           <div className="max-sm:hidden lg:flex-1 lg:justify-end items-center">
             <SearchInput />
-            {/* <div className="flex max-w-[310px] pr-3 items-center space-x-2">
-              <CustomInput
-                className="focus:outline-none flex h-[32px] w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-[15px] placeholder-gray-500 focus:ring-1 focus:ring-slate-900 focus:border-transparent"
-                type="search"
-                placeholder="Tìm Kiếm..."
-              />
-              <button className="bg-slate-900 hover:bg-slate-800 text-white  font-semibold py-2 px-5 rounded-md shadow-md transition-colors duration-300 ease-in-out flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="w-4 h-4 "
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
-                  />
-                </svg>
-              </button>
-            </div> */}
           </div>
 
           {/* Bars3Icon reponsive */}

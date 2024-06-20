@@ -1,24 +1,11 @@
-import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  RadioGroup,
-  Rating,
-} from "@mui/material";
+import { Rating } from "@mui/material";
 import { Kbd } from "flowbite-react";
 import BreadCrumb from "../components/BreadCrumb";
 import Meta from "../components/Meta";
 import { Fragment, useEffect, useState } from "react";
-import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
+import { Dialog, Disclosure, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { Link } from "react-router-dom";
-import {
-  ChevronDownIcon,
-  FunnelIcon,
-  MinusIcon,
-  PlusIcon,
-} from "@heroicons/react/20/solid";
+import { FunnelIcon, MinusIcon, PlusIcon } from "@heroicons/react/20/solid";
 import {
   MdDensityLarge,
   MdDensityMedium,
@@ -31,108 +18,85 @@ import CustomInput from "../components/CustomInput";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProducts } from "../features/products/productSlice";
 import { getUserCart } from "../features/user/userSlice";
-
-const sortOptions = [
-  { name: "Most Popular", href: "#", current: true },
-  { name: "Best Rating", href: "#", current: false },
-  { name: "Newest", href: "#", current: false },
-  { name: "Price: Low to High", href: "#", current: false },
-  { name: "Price: High to Low", href: "#", current: false },
-];
-const subCategories = [
-  { name: "Totes", href: "#" },
-  { name: "Backpacks", href: "#" },
-  { name: "Travel Bags", href: "#" },
-  { name: "Hip Bags", href: "#" },
-  { name: "Laptop Sleeves", href: "#" },
-];
-const filters = [
-  {
-    id: "color",
-    name: "Color",
-    options: [
-      { value: "white", label: "White", checked: false },
-      { value: "beige", label: "Beige", checked: false },
-      { value: "blue", label: "Blue", checked: true },
-      { value: "brown", label: "Brown", checked: false },
-      { value: "green", label: "Green", checked: false },
-      { value: "purple", label: "Purple", checked: false },
-    ],
-  },
-  {
-    id: "category",
-    name: "Category",
-    options: [
-      { value: "new-arrivals", label: "New Arrivals", checked: false },
-      { value: "sale", label: "Sale", checked: false },
-      { value: "travel", label: "Travel", checked: true },
-      { value: "organization", label: "Organization", checked: false },
-      { value: "accessories", label: "Accessories", checked: false },
-    ],
-  },
-  {
-    id: "size",
-    name: "Size",
-    options: [
-      { value: "2l", label: "2L", checked: false },
-      { value: "6l", label: "6L", checked: false },
-      { value: "12l", label: "12L", checked: false },
-      { value: "18l", label: "18L", checked: false },
-      { value: "20l", label: "20L", checked: false },
-      { value: "40l", label: "40L", checked: true },
-    ],
-  },
-];
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
-//
+import { Link } from "react-router-dom";
 
 const OurStore = () => {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [grid, setGrid] = useState(3);
+
+  const [brands, setBrands] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const dispatch = useDispatch();
-  const productState = useSelector((state) => state.product.products);
+  const productState = useSelector((state) => state.product.products) || [];
+  const [newData, setNewData] = useState([]);
+
+  // filter state
+  const [brand, setBrand] = useState(null);
+  const [tag, setTag] = useState(null);
+  const [category, setCategory] = useState(null);
+  const [minPrice, setMinPrice] = useState(null);
+  const [maxPrice, setMaxPrice] = useState(null);
+  const [sort, setSort] = useState("");
 
   useEffect(() => {
-    dispatch(getAllProducts());
-  }, [dispatch]);
-
-  const [checkedColor, setCheckedColor] = useState({
-    black: false,
-    white: false,
-    red: false,
-    blue: false,
-    pink: false,
-  });
-  const [checkedRam, setCheckedRam] = useState({
-    ram4gb: false,
-    ram6gb: false,
-    tam8gb: false,
-    ram12gb: false,
-    ram16gb: false,
-  });
-
-  const handleChangeColor = (event) => {
-    setCheckedColor({
-      ...checkedColor,
-      [event.target.name]: event.target.checked,
-    });
-  };
-
-  const handleChangeRam = (event) => {
-    setCheckedRam({
-      ...checkedRam,
-      [event.target.name]: event.target.checked,
-    });
-  };
+    setNewData(productState);
+  }, [newData]);
 
   useEffect(() => {
+    let newBrands = [];
+    let newTags = [];
+    let newCategories = [];
+
+    newData.forEach((element) => {
+      if (element.tags && typeof element.tags === "string") {
+        const tags = element.tags.split(",");
+        newTags.push(...tags);
+      }
+
+      newBrands.push(element.brand);
+      newCategories.push(element.category);
+    });
+
+    const uniqueBrands = [...new Set(newBrands)];
+    const uniqueTags = [...new Set(newTags)];
+    const uniqueCategories = [...new Set(newCategories)];
+
+    setBrands(uniqueBrands);
+    setTags(uniqueTags);
+    setCategories(uniqueCategories);
+  }, [newData]);
+
+  useEffect(() => {
+    dispatch(
+      getAllProducts({ sort, tag, brand, category, minPrice, maxPrice })
+    );
+
     dispatch(getUserCart());
-  }, [dispatch]);
+  }, [dispatch, sort, tag, brand, category, minPrice, maxPrice]);
+
+  const [showMore, setShowMore] = useState(false);
+  const [showMoreProducts, setShowMoreProducts] = useState(15);
+
+  const productsToShow = productState.slice(0, showMoreProducts);
+
+  const handleShowMore = () => {
+    if (productsToShow.length < productState.length) {
+      setShowMoreProducts((prevShowAll) => prevShowAll + 10);
+    } else {
+      setShowMore(true);
+    }
+  };
 
   const handleGridChange = (newGrid) => {
     setGrid(newGrid);
+  };
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
   };
 
   return (
@@ -185,79 +149,6 @@ const OurStore = () => {
                   </div>
 
                   {/* Filters */}
-                  <form className="mt-4 border-t border-gray-200">
-                    <h3 className="sr-only">Categories</h3>
-                    <ul
-                      role="list"
-                      className="px-2 py-3 font-medium text-gray-900"
-                    >
-                      {subCategories.map((category) => (
-                        <li key={category.name}>
-                          <a href={category.href} className="block px-2 py-3">
-                            {category.name}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {filters.map((section) => (
-                      <Disclosure
-                        as="div"
-                        key={section.id}
-                        className="border-t border-gray-200 px-4 py-6"
-                      >
-                        {({ open }) => (
-                          <>
-                            <h3 className="-mx-2 -my-3 flow-root">
-                              <Disclosure.Button className="flex w-full items-center justify-between bg-white px-2 py-3 text-gray-400 hover:text-gray-500">
-                                <span className="font-medium text-gray-900">
-                                  {section.name}
-                                </span>
-                                <span className="ml-6 flex items-center">
-                                  {open ? (
-                                    <MinusIcon
-                                      className="h-5 w-5"
-                                      aria-hidden="true"
-                                    />
-                                  ) : (
-                                    <PlusIcon
-                                      className="h-5 w-5"
-                                      aria-hidden="true"
-                                    />
-                                  )}
-                                </span>
-                              </Disclosure.Button>
-                            </h3>
-                            <Disclosure.Panel className="pt-6">
-                              <div className="space-y-6">
-                                {section.options.map((option, optionIdx) => (
-                                  <div
-                                    key={option.value}
-                                    className="flex items-center"
-                                  >
-                                    <CustomInput
-                                      id={`filter-mobile-${section.id}-${optionIdx}`}
-                                      name={`${section.id}[]`}
-                                      defaultValue={option.value}
-                                      type="checkbox"
-                                      defaultChecked={option.checked}
-                                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                                    />
-                                    <label
-                                      htmlFor={`filter-mobile-${section.id}-${optionIdx}`}
-                                      className="ml-3 min-w-0 flex-1 text-gray-500"
-                                    >
-                                      {option.label}
-                                    </label>
-                                  </div>
-                                ))}
-                              </div>
-                            </Disclosure.Panel>
-                          </>
-                        )}
-                      </Disclosure>
-                    ))}
-                  </form>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -274,57 +165,31 @@ const OurStore = () => {
           lg:flex-row space-y-3
           "
           >
-            <h1 className="text-4xl  font-bold tracking-tight uppercase text-gray-900">
-              Iphone
-            </h1>
+            <div
+              onClick={() => window.location.reload()}
+              className="text-2xl font-bold cursor-pointer hover:text-gray-800 tracking-tight uppercase text-gray-900"
+            >
+              sản phẩm
+            </div>
             <div className="flex items-center justify-between">
               <p className="font-semibold text-slate-500 text-sm mr-3">
                 {productState.length} Sản phẩm
               </p>
-              <Menu as="div" className="relative inline-block text-left">
-                <div>
-                  <Menu.Button className="group inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900">
-                    Sort
-                    <ChevronDownIcon
-                      className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
-                      aria-hidden="true"
-                    />
-                  </Menu.Button>
-                </div>
-
-                <Transition
-                  as={Fragment}
-                  enter="transition ease-out duration-100"
-                  enterFrom="transform opacity-0 scale-95"
-                  enterTo="transform opacity-100 scale-100"
-                  leave="transition ease-in duration-75"
-                  leaveFrom="transform opacity-100 scale-100"
-                  leaveTo="transform opacity-0 scale-95"
+              <div className="relative inline-block text-left outline-none">
+                <select
+                  onChange={(e) => setSort(e.target.value)}
+                  value={sort}
+                  defaultValue={"manula"}
+                  className="group outline-none inline-flex justify-center text-sm font-medium text-gray-700 hover:text-gray-900 px-2 py-1 border border-gray-300 rounded-md"
                 >
-                  <Menu.Items className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <div className="py-1">
-                      {sortOptions.map((option) => (
-                        <Menu.Item key={option.name}>
-                          {({ active }) => (
-                            <a
-                              href={option.href}
-                              className={classNames(
-                                option.current
-                                  ? "font-medium text-gray-900"
-                                  : "text-gray-500",
-                                active ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm"
-                              )}
-                            >
-                              {option.name}
-                            </a>
-                          )}
-                        </Menu.Item>
-                      ))}
-                    </div>
-                  </Menu.Items>
-                </Transition>
-              </Menu>
+                  <option value="title">Từ A-Z</option>
+                  <option value="-title">Từ Z-A</option>
+                  <option value="price">Giá thấp đến cao</option>
+                  <option value="-price">Giá cao đến thấp</option>
+                  <option value="createdAt">Sản phẩm mới</option>
+                  <option value="-createdAt">Sản phẩm cũ</option>
+                </select>
+              </div>
 
               {/* action icon */}
               <div className="items-center pl-3 flex gap-2">
@@ -404,60 +269,23 @@ const OurStore = () => {
                   <h3 className="font-semibold text-lg">Danh mục sản phẩm</h3>
                   <div className="py-3 px-3">
                     <ul className="text-black">
-                      <li className="mb-2 opacity-70 font-medium bg-slate-100 hover:opacity-100 hover:bg-slate-200 cursor-pointer p-2 rounded-lg">
-                        <a className="px-4">Xiaomi</a>
-                      </li>
-                      <li className="mb-2 opacity-70 font-medium bg-slate-100 hover:opacity-100 hover:bg-slate-200 cursor-pointer p-2 rounded-lg">
-                        <a className="px-4">Samsung</a>
-                      </li>
-                      <li className="mb-2 opacity-70 font-medium bg-slate-100 hover:opacity-100 hover:bg-slate-200 cursor-pointer p-2 rounded-lg">
-                        <a className="px-4">Oppo</a>
-                      </li>
-                      <li className="mb-2 opacity-70 font-medium bg-slate-100 hover:opacity-100 hover:bg-slate-200 cursor-pointer p-2 rounded-lg">
-                        <a className="px-4">Vivo</a>
-                      </li>
+                      {brands &&
+                        [...new Set(brands)].slice(0, 7).map((item, index) => (
+                          <li
+                            key={index}
+                            onClick={() => setBrand(item)}
+                            className="mb-2 opacity-70 font-medium bg-slate-100 hover:opacity-100 hover:bg-slate-200 cursor-pointer p-2 rounded-lg"
+                          >
+                            <a className="px-4">{item}</a>
+                          </li>
+                        ))}
                     </ul>
                   </div>
                 </div>
                 {/* filter */}
                 <div className="bg-white p-5 rounded-lg mb-3">
                   <h3 className="font-semibold text-lg">Filter By</h3>
-                  {/* pin */}
-                  <div className="px-4 py-2">
-                    <h3 className="text-base font-medium">Pin</h3>
-                    <FormGroup className="px-4">
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            sx={{ "& .MuiSvgIcon-root": { fontSize: 17 } }}
-                            color="default"
-                          />
-                        }
-                        label="6000 mAh (6)"
-                        className="focus:outline-none"
-                      />
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            sx={{ "& .MuiSvgIcon-root": { fontSize: 17 } }}
-                            color="default"
-                          />
-                        }
-                        label="5000 mAh (6)"
-                        className="focus:outline-none"
-                      />
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            sx={{ "& .MuiSvgIcon-root": { fontSize: 17 } }}
-                            color="default"
-                          />
-                        }
-                        label="4000 mAh (6)"
-                        className="focus:outline-none"
-                      />
-                    </FormGroup>
-                  </div>
+
                   {/* price */}
                   <div className="px-4 py-2">
                     <h3 className="text-base font-medium">Price</h3>
@@ -467,7 +295,10 @@ const OurStore = () => {
                       </label>
                       <div className="mt-2">
                         <CustomInput
-                          type="text"
+                          onChange={(e) => {
+                            setMinPrice(e.target.value);
+                          }}
+                          type="number"
                           placeholder=""
                           className="block w-32 xl:w-56 rounded-md py-1.5 px-2 ring-1 ring-inset ring-gray-400 focus:text-gray-800"
                         />
@@ -477,238 +308,51 @@ const OurStore = () => {
                       </label>
                       <div className="mt-2">
                         <CustomInput
-                          type="text"
+                          onChange={(e) => {
+                            setMaxPrice(e.target.value);
+                          }}
+                          type="number"
                           placeholder=""
                           className="block w-32 xl:w-56 rounded-md py-1.5 px-2 ring-1 ring-inset ring-gray-400 focus:text-gray-800"
                         />
                       </div>
                     </div>
                   </div>
-                  {/* color */}
-                  <div className="px-4 py-2">
-                    <h3 className="text-base font-medium">Color</h3>
-                    <div className="px-4">
-                      <FormControl>
-                        <RadioGroup row>
-                          <FormControlLabel
-                            value="black"
-                            control={
-                              <Checkbox
-                                name="black"
-                                checked={checkedColor.black}
-                                onChange={handleChangeColor}
-                                style={{
-                                  color: checkedColor.black
-                                    ? "black"
-                                    : "default",
-                                }}
-                                size="big"
-                              />
-                            }
-                            label="Đen"
-                          />
-                          <FormControlLabel
-                            value="white"
-                            control={
-                              <Checkbox
-                                name="white"
-                                checked={checkedColor.white}
-                                onChange={handleChangeColor}
-                                style={{
-                                  color: checkedColor.white
-                                    ? "gray"
-                                    : "default",
-                                }}
-                                size="big"
-                              />
-                            }
-                            label="Trắng"
-                          />
-                          <FormControlLabel
-                            value="red"
-                            control={
-                              <Checkbox
-                                name="red"
-                                checked={checkedColor.red}
-                                onChange={handleChangeColor}
-                                style={{
-                                  color: checkedColor.red ? "red" : "default",
-                                }}
-                                size="big"
-                              />
-                            }
-                            label="Đỏ"
-                          />
-                          <FormControlLabel
-                            value="blue"
-                            control={
-                              <Checkbox
-                                name="blue"
-                                checked={checkedColor.blue}
-                                onChange={handleChangeColor}
-                                style={{
-                                  color: checkedColor.blue ? "blue" : "default",
-                                }}
-                                size="big"
-                              />
-                            }
-                            label="Xanh dương"
-                          />
-                          <FormControlLabel
-                            value="pink"
-                            control={
-                              <Checkbox
-                                name="pink"
-                                checked={checkedColor.pink}
-                                onChange={handleChangeColor}
-                                style={{
-                                  color: checkedColor.pink ? "pink" : "default",
-                                }}
-                                size="big"
-                              />
-                            }
-                            label="Hồng"
-                          />
-                        </RadioGroup>
-                      </FormControl>
-                    </div>
-                  </div>
-                  {/* Ram */}
-                  <div className="px-4 py-2">
-                    <h3 className="text-base font-medium">Ram</h3>
-                    <div className="px-4">
-                      <FormControl>
-                        <RadioGroup row>
-                          <FormControlLabel
-                            value="ram4gb"
-                            control={
-                              <Checkbox
-                                checked={checkedRam.ram4gb}
-                                onChange={handleChangeRam}
-                                name="ram4gb"
-                                size="big"
-                                color="default"
-                              />
-                            }
-                            label="RAM 4GB"
-                          />
-                          <FormControlLabel
-                            value="ram6gb"
-                            control={
-                              <Checkbox
-                                checked={checkedRam.ram6gb}
-                                onChange={handleChangeRam}
-                                name="ram6gb"
-                                size="big"
-                              />
-                            }
-                            label="RAM 6GB"
-                          />
-                          <FormControlLabel
-                            value="ram8gb"
-                            control={
-                              <Checkbox
-                                checked={checkedRam.ram8gb}
-                                onChange={handleChangeRam}
-                                name="ram8gb"
-                                size="big"
-                                color="default"
-                              />
-                            }
-                            label="RAM 8GB"
-                          />
-                          <FormControlLabel
-                            value="ram12gbb"
-                            control={
-                              <Checkbox
-                                checked={checkedRam.ram12gb}
-                                onChange={handleChangeRam}
-                                name="ram12gb"
-                                size="big"
-                                color="default"
-                              />
-                            }
-                            label="RAM 12GB"
-                          />
-                          <FormControlLabel
-                            value="ram16gb"
-                            control={
-                              <Checkbox
-                                checked={checkedRam.ram16gb}
-                                onChange={handleChangeRam}
-                                name="ram16gb"
-                                size="big"
-                                color="default"
-                              />
-                            }
-                            label="RAM 16GB"
-                          />
-                        </RadioGroup>
-                      </FormControl>
-                    </div>
-                  </div>
                 </div>
 
-                {/* <div className="bg-white p-5 rounded-lg mb-3">
-                  <h3 className="font-semibold text-lg">Product Tags</h3>
-                  <div className="p-4">
-                    <div className="flex gap-2 flex-wrap font-semibold ">
-                      <div className="px-4 py-2 opacity-80 hover:opacity-100 text-sm cursor-pointer bg-slate-300 rounded-lg">
-                        xiaomi
-                      </div>
-                      <div className="px-4 py-2 opacity-80 hover:opacity-100 text-sm cursor-pointer bg-slate-300 rounded-lg">
-                        Iphone
-                      </div>
-                      <div className="px-4 py-2 opacity-80 hover:opacity-100 text-sm cursor-pointer bg-slate-300 rounded-lg">
-                        Sam Sung
-                      </div>
-                      <div className="px-4 py-2 opacity-80 hover:opacity-100 text-sm cursor-pointer bg-slate-300 rounded-lg">
-                        Oppo
-                      </div>
-                      <div className="px-4 py-2 opacity-80 hover:opacity-100 text-sm cursor-pointer bg-slate-300 rounded-lg">
-                        Vivo
-                      </div>
-                    </div>
-                  </div>
-                </div> */}
                 <div className="bg-white p-5 rounded-lg mb-3">
                   <h3 className="font-semibold text-lg">Product Tags</h3>
                   <div className="flex flex-wrap gap-1 p-4">
-                    <Link to="/product" className="pb-3">
-                      <Kbd>Xiaomi</Kbd>
-                    </Link>
-                    <Link to="/product" className="pb-3 px-1">
-                      <Kbd>Oppo</Kbd>
-                    </Link>
-                    <Link to="/product" className="pb-3 px-1">
-                      <Kbd>Iphone</Kbd>
-                    </Link>
-                    <Link to="/product" className="pb-3 px-1">
-                      <Kbd>Sam Sung</Kbd>
-                    </Link>
-                    <Link to="/product" className="pb-3 px-1">
-                      <Kbd>Vivo</Kbd>
-                    </Link>
-                    <Link to="/product" className="pb-3 px-1">
-                      <Kbd>Spacebar</Kbd>
-                    </Link>
-                    <Link to="/product" className="pb-3 px-1">
-                      <Kbd>Dell</Kbd>
-                    </Link>
+                    {tags &&
+                      [...new Set(tags)].slice(0, 9).map((item, index) => (
+                        <div
+                          key={index}
+                          onClick={() => {
+                            setTag(item);
+                          }}
+                          className="pb-3 cursor-pointer"
+                        >
+                          <Kbd>{item}</Kbd>
+                        </div>
+                      ))}
                   </div>
                 </div>
 
                 <div className="bg-white p-5 rounded-lg mb-3">
                   <h3 className="font-semibold text-lg">Sản phẩm liên quan</h3>
                   <div className="  p-3 rounded-lg items-center flex flex-col justify-center ">
-                    {[...Array(2)].map((_, index) => (
-                      <button
+                    {productState.slice(0, 3).map((item, index) => (
+                      <Link
                         key={index}
-                        to="/store"
+                        to={"/product/" + item._id}
                         className="relative bg-white hover:bg-slate-200 rounded-lg shadow-lg shadow-slate-200 ring-1 ring-slate-300 transition duration-500 scale-95 hover:scale-100"
                       >
                         <img
-                          src={images.product.watch}
+                          src={
+                            item?.images[0]?.url
+                              ? images.product.watch
+                              : images.product.watch
+                          }
                           className="object-cover w-full h-40 lg:h-auto"
                           alt="Samsung Galaxy S24 Ultra"
                         />
@@ -717,12 +361,19 @@ const OurStore = () => {
                             Giảm giá
                           </p>
                           <h2 className="text-lg lg:text-2xl font-semibold transition duration-500 text-gray-800 py-3">
-                            Galaxy S24 Ultra
+                            {item?.title}
                           </h2>
-                          <Rating readOnly defaultValue={4} size="small" />
+                          <Rating
+                            readOnly
+                            defaultValue={
+                              Number(item?.totalrating)
+                                ? Number(item?.totalrating)
+                                : 4
+                            }
+                            size="small"
+                          />
                           <p className="text-base font-semibold text-red-500">
-                            Giá chỉ còn 14.000.000{" "}
-                            <sup className="text-sm">đ</sup>
+                            Giá chỉ còn: {formatCurrency(item?.price)}
                           </p>
                           <p className="text-sm text-gray-600">
                             Giảm 10% cho học sinh - sinh viên
@@ -733,7 +384,7 @@ const OurStore = () => {
                             Trả góp 0%
                           </p>
                         </div>
-                      </button>
+                      </Link>
                     ))}
                   </div>
                 </div>
@@ -742,11 +393,19 @@ const OurStore = () => {
               <div className="col-span-3 py-3 px-5">
                 <div className="bg-white p-5 rounded-lg mb-3">
                   <div className="bg-white rounded-lg gap-4 grid grid-cols-12">
-                    <ProductCard
-                      data={productState ? productState : []}
-                      grid={grid}
-                    />
+                    <ProductCard data={productsToShow} grid={grid} />
                   </div>
+
+                  {showMore == false && (
+                    <div className="mt-7 text-center">
+                      <button
+                        onClick={handleShowMore}
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                      >
+                        Xem thêm
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

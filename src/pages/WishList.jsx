@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getUserProductWishList } from "./../features/user/userSlice";
 import { addToWishList } from "../features/products/productSlice";
+import { toast } from "react-toastify";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 10,
@@ -42,6 +43,7 @@ const WishList = () => {
     dispatch(addToWishList(id)).then(() => {
       dispatch(getUserProductWishList());
     });
+    toast.success("Xóa thành công");
   };
 
   const formatCurrency = (amount) => {
@@ -76,7 +78,9 @@ const WishList = () => {
                   />
                   <img
                     src={
-                      item.images ? images.product.anh4 : images.product.anh4
+                      item?.images
+                        ? "https://cdn.hoanghamobile.com/i/productlist/ts/Uploads/2024/04/26/nubia-neo-2-5g.png"
+                        : images.product.anh4
                     }
                     alt={item?.images[0].public_id}
                     className="rounded-lg object-cover p-5 h-auto w-full pointer-events-none"
@@ -84,12 +88,12 @@ const WishList = () => {
                 </div>
                 <div className="p-4">
                   <h5 className="text-xl font-semibold mb-2 text-gray-800 hover:text-blue-600 transition-colors">
-                    {item.title}
+                    {item?.title}
                   </h5>
                   <p className="text-base font-medium text-red-500 mb-4">
                     Giá: {formatCurrency(item?.price)}
                     <sub className="pl-2 text-sm line-through text-gray-500">
-                      500000
+                      {formatCurrency(item?.price + 1000000)}
                     </sub>
                   </p>
                   <div>
@@ -112,7 +116,7 @@ const WishList = () => {
                     </div>
 
                     <Link
-                      to="/cart"
+                      to={"/product/" + item?._id}
                       className="shadow-md flex items-center group-hover:gap-2 bg-gradient-to-br from-lime-200 to-yellow-200 p-3 rounded-full cursor-pointer duration-700"
                     >
                       <FaBagShopping className="text-xl" />

@@ -13,18 +13,18 @@ const FooterComponent = () => {
   return (
     <>
       {/* header */}
-      <footer className="bg-slate-200 pb-4 pt-3 border-t  border-slate-400 ">
+      <footer className="bg-slate-200 py-7 border-t  border-slate-400 ">
         <div
           className="container lg:px-32 mx-auto flex flex-wrap justify-between items-center space-y-4 
         max-sm:space-y-5 max-sm:flex-col max-sm:justify-center"
         >
           <div className="flex items-center space-x-6 ">
             <FaRegPaperPlane className="h-8 w-8" />
-            <h2 className="text-xl font-medium text-slate-900 ">
-              Sign Up For Newsletter
+            <h2 className="text-4xl font-medium text-slate-900 ">
+              Hoàng Hà Mobile
             </h2>
           </div>
-          <div className="flex flex-row max-sm:flex-col items-center space-y-0 space-x-2 max-sm:space-y-4 max-sm:space-x-2">
+          <div className="sr-only flex flex-row max-sm:flex-col items-center space-y-0 space-x-2 max-sm:space-y-4 max-sm:space-x-2">
             <CustomInput
               className="focus:outline-none h-10 w-full max-sm:w-[260px] md:w-auto lg:w-[280px] placeholder:text-zinc-900 placeholder:opacity-50 font-mono rounded-md border border-gray-500 bg-white px-3 py-2 text-sm placeholder-gray-500 focus:ring-1 focus:ring-slate-900 focus:border-transparent"
               type="search"

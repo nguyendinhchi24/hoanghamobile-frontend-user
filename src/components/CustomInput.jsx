@@ -8,6 +8,7 @@ const CustomInput = ({
   onChange,
   onBlur,
   value,
+  disabled,
   ...rest
 }) => {
   return (
@@ -15,6 +16,7 @@ const CustomInput = ({
       <input
         placeholder={placeholder}
         className={className}
+        disabled={disabled}
         onChange={onChange}
         onBlur={onBlur}
         value={value}
@@ -28,6 +30,7 @@ const CustomInput = ({
 
 CustomInput.propTypes = {
   type: PropTypes.string,
+  disabled: PropTypes.bool,
   name: PropTypes.string,
   placeholder: PropTypes.string,
   className: PropTypes.string,

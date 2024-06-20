@@ -1,89 +1,19 @@
 import Meta from "../components/Meta";
 import BreadCrumb from "../components/BreadCrumb";
-import { Checkbox } from "flowbite-react";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import images from "../assets";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { checkOut, getUserCart } from "../features/user/userSlice";
-import axios from "axios";
-
-let Districts = [
-  {
-    districts_id: 1,
-    districts_name: "Hà Nội",
-    data: [
-      { value: "1", name: "Quận Ba Đình" },
-      { value: "2", name: "Quận Hoàn Kiếm" },
-      { value: "3", name: "Quận Tây Hồ" },
-      { value: "4", name: "Quận Long Biên" },
-      { value: "5", name: "Quận Cầu Giấy" },
-      { value: "6", name: "Quận Đống Đa" },
-      { value: "7", name: "Quận Hai Bà Trưng" },
-      { value: "8", name: "Quận Hoàng Mai" },
-      { value: "9", name: "Quận Thanh Xuân" },
-      { value: "10", name: "Huyện Sóc Sơn" },
-      { value: "11", name: "Huyện Đông Anh" },
-      { value: "12", name: "Huyện Gia Lâm" },
-      { value: "13", name: "Quận Nam Từ Liêm" },
-      { value: "14", name: "Huyện Thanh Trì" },
-      { value: "15", name: "Quận Bắc Từ Liêm" },
-      { value: "16", name: "Huyện Mê Linh" },
-      { value: "17", name: "Quận Hà Đông" },
-      { value: "18", name: "Thị xã Sơn Tây" },
-      { value: "19", name: "Huyện Ba Vì" },
-      { value: "20", name: "Huyện Phúc Thọ" },
-      { value: "21", name: "Huyện Đan Phượng" },
-      { value: "22", name: "Huyện Hoài Đức" },
-      { value: "23", name: "Huyện Quốc Oai" },
-      { value: "24", name: "Huyện Thạch Thất" },
-      { value: "25", name: "Huyện Chương Mỹ" },
-      { value: "26", name: "Huyện Thanh Oai" },
-      { value: "27", name: "Huyện Thường Tín" },
-      { value: "28", name: "Huyện Phú Xuyên" },
-      { value: "29", name: "Huyện Ứng Hòa" },
-      { value: "30", name: "Huyện Mỹ Đức" },
-    ],
-  },
-  {
-    districts_id: 2,
-    districts_name: "Bắc Giang",
-    data: [
-      { value: "1", name: "Thành phố Bắc Giang" },
-      { value: "2", name: "Huyện Yên Thế" },
-      { value: "3", name: "Huyện Tân Yên" },
-      { value: "4", name: "Huyện Lạng Giang" },
-      { value: "4", name: "Huyện Lục Nam" },
-      { value: "5", name: "Huyện Sơn Động" },
-      { value: "6", name: "Huyện Yên Dũng" },
-      { value: "7", name: "Huyện Hiệp Hòa" },
-      { value: "8", name: "Huyện Việt Yên" },
-    ],
-  },
-  {
-    districts_id: 3,
-    districts_name: "Bắc Ninh",
-    data: [
-      { value: "1", name: "Thành phố Bắc Ninh" },
-      { value: "2", name: "Thành phố Bắc Ninh" },
-      { value: "3", name: "Huyện Yên Phong" },
-      { value: "4", name: "Huyện Quế Võ" },
-      { value: "5", name: "Huyện Tiên Du" },
-      { value: "6", name: "Thị xã Từ Sơn" },
-      { value: "7", name: "Huyện Thuận Thành" },
-      { value: "8", name: "Huyện Gia Bình" },
-      { value: "9", name: "Huyện Lương Tài" },
-    ],
-  },
-];
+import { createAnOrder, getUserCart } from "../features/user/userSlice";
 
 let checkOutSchema = Yup.object({
   state: Yup.string().required("State không được để trống"),
   name: Yup.string().required("Name không được để trống"),
+  phone: Yup.string().required("Phone không được để trống"),
   address: Yup.string().required("Địa chỉ không được để trống"),
   description: Yup.string(),
 });
@@ -91,89 +21,84 @@ let checkOutSchema = Yup.object({
 const CheckOut = () => {
   const [selectedState, setSelectedState] = useState("");
   const [total, setTotal] = useState(0);
-  // const [items, setItems] = useState([]);
+  const navigate = useNavigate();
   const shippingFee = 30000;
   const dispatch = useDispatch();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const cartState = useSelector((state) => state.auth.cartProducts) || [];
   const userState = useSelector((state) => state.auth.user) || [];
-  // const [carts, setCarts] = useState([
-  //   {
-  //     id: "222",
-  //     totalPrice: 9999,
-  //     products: [
-  //       {
-  //         id: "204727",
-  //         name: "YOMOST Bac Ha&Viet Quat 170ml",
-  //         description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
-  //         category: "beverage",
-  //         imageUrl: "https://momo.vn/uploads/product1.jpg",
-  //         manufacturer: "Vinamilk",
-  //         price: 1,
-  //         quantity: 1,
-  //         unit: "hộp",
-  //         totalPrice: 10000,
-  //         taxAmount: "200",
-  //       },
-  //       {
-  //         id: "204727",
-  //         name: "YOMOST Bac Ha&Viet Quat 170ml",
-  //         description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
-  //         category: "beverage",
-  //         imageUrl: "https://momo.vn/uploads/product1.jpg",
-  //         manufacturer: "Vinamilk",
-  //         price: 1,
-  //         quantity: 1,
-  //         unit: "hộp",
-  //         totalPrice: 10000,
-  //         taxAmount: "200",
-  //       },
-  //     ],
-  //   },
-  // ]);
-
-  // const [userInfo, setUserInfo] = useState({
-  //   name: "Nguyen Van A",
-  //   phoneNumber: "0999888999",
-  //   email: "email_add@domain.com",
-  // });
+  const { _id: userId } = userState;
+  // const orderIdProduct = useSelector((state) => state.auth.orderIdProduct);
 
   const handleCheckout = (values) => {
-    const endpoint = values.state === "momo" ? "checkout" : "create-order";
+    const orderItems = cartState.map((item) => ({
+      product: item.productId._id,
+      color: item.color._id,
+      quantity: item.quantity,
+      price: item.price,
+    }));
 
-    // Build the correct payload format
+    const totalPrice = cartState.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+
     const payload = {
-      carts: [
-        {
-          id: "222",
-          totalPrice: 9999,
-          products: [
-            {
-              id: "204727",
-              name: "YOMOST Bac Ha&Viet Quat 170ml",
-              description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
-              category: "beverage",
-              imageUrl: "https://momo.vn/uploads/product1.jpg",
-              manufacturer: "Vinamilk",
-              price: 1,
-              quantity: 1,
-              unit: "hộp",
-              totalPrice: 10000,
-              taxAmount: "200",
-            },
-          ],
-        },
-      ],
-      userInfo: {
-        name: "Nguyen Van A",
-        phone: "0999888999",
-        email: "email_add@domain.com",
+      user: userId,
+      shippingInfo: {
+        name: values.name,
+        phone: values.phone,
+        address: values.address,
+        state: values.state,
+        other: values.description,
       },
+      orderItems: orderItems,
+      totalPrice: totalPrice,
+      totalPriceAfterDiscount: totalPrice,
+      orderStatus: "Success",
     };
 
-    if (endpoint === "checkout") {
-      dispatch(checkOut(payload));
+    if (values.state == "money") {
+      dispatch(createAnOrder(payload));
     }
   };
+
+  // const handleCheckout = (values) => {
+  //   const endpoint = values.state === "momo" ? "checkout" : "create-order";
+
+  //   const payload = {
+  //     carts: [
+  //       {
+  //         id: "222",
+  //         totalPrice: 9999,
+  //         products: [
+  //           {
+  //             id: "204727",
+  //             name: "YOMOST Bac Ha&Viet Quat 170ml",
+  //             description: "YOMOST Sua Chua Uong Bac Ha&Viet Quat 170ml/1 Hop",
+  //             category: "beverage",
+  //             imageUrl: "https://momo.vn/uploads/product1.jpg",
+  //             manufacturer: "Vinamilk",
+  //             price: 1,
+  //             quantity: 1,
+  //             unit: "hộp",
+  //             totalPrice: 10000,
+  //             taxAmount: "200",
+  //           },
+  //         ],
+  //       },
+  //     ],
+  //     userInfo: {
+  //       name: "Nguyen Van A",
+  //       phone: "0999888999",
+  //       email: "email_add@domain.com",
+  //     },
+  //   };
+
+  //   if (endpoint === "checkout") {
+  //     dispatch(checkOut(payload));
+  //   }
+  // };
 
   useEffect(() => {
     dispatch(getUserCart());
@@ -192,6 +117,7 @@ const CheckOut = () => {
   const formik = useFormik({
     initialValues: {
       name: "",
+      phone: "",
       address: "",
       description: "",
       state: "",
@@ -321,20 +247,6 @@ const CheckOut = () => {
             </div>
             {/* address */}
             <div className="col-span-6 p-8 bg-white rounded-lg">
-              <div className="border-b ">
-                <h3 className="text-center font-medium text-lg text-gray-900">
-                  Thôn tin liên hệ
-                </h3>
-                <div className="flex gap-3">
-                  <p className="py-2 text-gray-800">Name: {userState.name}</p>
-                  <p className="py-2 text-gray-800">Email: {userState.email}</p>
-                  <p className="py-2 text-gray-800">Phone: {userState.phone}</p>
-                </div>
-                <div className="flex items-center text-gray-800 gap-3 py-4">
-                  <Checkbox size="small" />
-                  <p>Gửi các ưu đãi cho tôi</p>
-                </div>
-              </div>
               <div className="">
                 <div>
                   <h3 className="text-center mt-2 mb-1 font-medium text-lg text-gray-900">
@@ -376,6 +288,31 @@ const CheckOut = () => {
                     <div className="flex justify-between">
                       <div className="flex gap-3 items-center">
                         <label className="font-semibold text-sm text-gray-600 pb-1 block">
+                          Phone
+                        </label>
+                        <p className="text-red-600 text-lg">*</p>
+                      </div>
+                      <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                        {formik.touched.phone && formik.errors.phone ? (
+                          <div>{formik.errors.phone}</div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <CustomInput
+                      className="w-full px-3 py-2 border bg-gray-100 border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Enter your phone"
+                      type="number"
+                      name="phone"
+                      onChange={formik.handleChange("phone")}
+                      onBlur={formik.handleBlur("phone")}
+                      value={formik.values.phone}
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex justify-between">
+                      <div className="flex gap-3 items-center">
+                        <label className="font-semibold text-sm text-gray-600 pb-1 block">
                           Địa chỉ cụ thể
                         </label>
                         <p className="text-red-600 text-lg">*</p>
@@ -396,6 +333,7 @@ const CheckOut = () => {
                       value={formik.values.address}
                     />
                   </div>
+
                   <div className="mb-4">
                     <div className="flex justify-between">
                       <label className="font-semibold text-sm text-gray-600 pb-1 block">
@@ -417,8 +355,9 @@ const CheckOut = () => {
                       placeholder="Ghi chú"
                     ></textarea>
                   </div>
+
+                  {/* state */}
                   <div className="mb-4">
-                    {/* state */}
                     <div className="flex flex-col">
                       <div className="flex justify-between">
                         <div className="flex gap-3 items-center">
@@ -474,7 +413,15 @@ const CheckOut = () => {
                       </svg>
                       <p>Quay lại</p>
                     </Link>
-                    <button className="py-3 opacity-80 border-2 text-white hover:opacity-100 tracking-widest transition duration-300 px-4 bg-slate-900 rounded-lg font-medium">
+                    <button
+                      onClick={() => {
+                        setTimeout(() => {
+                          dispatch(getUserCart());
+                          navigate("/my-orders");
+                        }, 800);
+                      }}
+                      className="py-3 opacity-80 border-2 text-white hover:opacity-100 tracking-widest transition duration-300 px-4 bg-slate-900 rounded-lg font-medium"
+                    >
                       Đặt hàng
                     </button>
                   </div>

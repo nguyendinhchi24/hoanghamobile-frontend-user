@@ -21,7 +21,7 @@ const MyComponent = ({ title }) => (
     </div>
     <div className="flex items-center gap-3 mt-5 lg:mt-0">
       <Link
-        to="/compare-product"
+        to="/comparelist"
         className="flex items-center text-sm font-medium opacity-85 hover:opacity-100 transition duration-300 gap-2 px-6 py-2 rounded-lg text-white bg-slate-800"
       >
         <SiConvertio className="h-4 w-4" />

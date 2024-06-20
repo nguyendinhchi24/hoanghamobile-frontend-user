@@ -1,10 +1,36 @@
 import Meta from "../components/Meta";
 import BreadCrumb from "../components/BreadCrumb";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { resetPassword } from "../features/user/userSlice";
 
+let forgotPasswordSchema = Yup.object({
+  password: Yup.string().required("Password Không được để trống"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("password"), null], "Confirm Password không khớp")
+    .required("Confirm Password Không được để trống"),
+});
 const ResetPassword = () => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const getToken = location.pathname.split("/")[2];
+  const formik = useFormik({
+    initialValues: {
+      password: "",
+      confirmPassword: "",
+    },
+    validationSchema: forgotPasswordSchema,
+    onSubmit: (values) => {
+      dispatch(resetPassword({ token: getToken, password: values.password }));
+      navigate("/login");
+    },
+  });
   return (
     <>
       <Meta title={"Reset Password"} />
@@ -15,15 +41,34 @@ const ResetPassword = () => {
             <h1 className="text-2xl font-bold sm:text-3xl">Reset Password</h1>
           </div>
 
-          <form className="mx-auto mb-0 mt-8 max-w-md space-y-4" action="#">
+          <form
+            onSubmit={formik.handleSubmit}
+            className="mx-auto mb-0 mt-8 max-w-md space-y-4"
+          >
             <div>
-              <label className="sr-only">Password</label>
+              <div className="flex justify-between">
+                <label
+                  className="font-semibold text-sm text-gray-600 pb-1 block"
+                  htmlFor="login"
+                >
+                  Password
+                </label>
+                <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                  {formik.touched.password && formik.errors.password ? (
+                    <div>{formik.errors.password}</div>
+                  ) : null}
+                </div>
+              </div>
               <div className="relative">
                 <CustomInput
                   placeholder="Enter your password"
                   className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
                   id="password"
                   type="password"
+                  name="password"
+                  onChange={formik.handleChange("password")}
+                  onBlur={formik.handleBlur("password")}
+                  value={formik.values.password}
                 />
                 <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
                   <svg
@@ -50,13 +95,30 @@ const ResetPassword = () => {
               </div>
             </div>
             <div>
-              <label className="sr-only">Password</label>
+              <div className="flex justify-between">
+                <label
+                  className="font-semibold text-sm text-gray-600 pb-1 block"
+                  htmlFor="login"
+                >
+                  Confirm Password
+                </label>
+                <div className="error text-red-500 text-sm p-0 m-0 font-medium">
+                  {formik.touched.confirmPassword &&
+                  formik.errors.confirmPassword ? (
+                    <div>{formik.errors.confirmPassword}</div>
+                  ) : null}
+                </div>
+              </div>
               <div className="relative">
                 <CustomInput
                   placeholder="Enter your confirm password"
                   className="w-full rounded-lg border-gray-300 p-4 pe-12 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                  id="password"
+                  id="confirmPassword"
                   type="password"
+                  name="confirmPassword"
+                  onChange={formik.handleChange("confirmPassword")}
+                  onBlur={formik.handleBlur("confirmPassword")}
+                  value={formik.values.confirmPassword}
                 />
                 <span className="absolute inset-y-0 end-0 grid place-content-center px-4">
                   <svg
@@ -90,18 +152,10 @@ const ResetPassword = () => {
                   Login
                 </Link>
               </p>
-              <Link
-                to="/"
-                className="inline-block rounded-lg bg-white px-5 py-3 text-sm font-medium text-black border-2 items-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300 hover:bg-gray-200"
-              >
-                Cancel
-              </Link>
-              <Link
-                to="/"
-                className="inline-block rounded-lg bg-purple-600 px-5 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 opacity-75 hover:opacity-100 transition duration-300"
-              >
-                OK
-              </Link>
+
+              <button className="inline-block rounded-lg bg-purple-600 px-14 py-3 text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 opacity-75 hover:opacity-100 transition duration-300">
+                Submit
+              </button>
             </div>
           </form>
         </div>

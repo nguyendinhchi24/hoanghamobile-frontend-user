@@ -1,5 +1,8 @@
 import { useDispatch } from "react-redux";
-import { addToWishList } from "../features/products/productSlice";
+import {
+  addToCompareList,
+  addToWishList,
+} from "../features/products/productSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Checkbox, IconButton, Tooltip } from "@mui/material";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
@@ -7,8 +10,8 @@ import Rating from "@mui/material/Rating";
 import PropTypes from "prop-types";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import CompareArrowsOutlinedIcon from "@mui/icons-material/CompareArrowsOutlined";
-import images from "../assets";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const ProductCard = ({ data, grid }) => {
   const location = useLocation();
@@ -19,6 +22,11 @@ const ProductCard = ({ data, grid }) => {
     const savedLikes = JSON.parse(localStorage.getItem("likedItems")) || {};
     return savedLikes;
   });
+  const [compareItems, setCompareItems] = useState(() => {
+    const savedCompares =
+      JSON.parse(localStorage.getItem("compareItems")) || {};
+    return savedCompares;
+  });
 
   const addToWish = (id) => {
     const updatedLikes = { ...likedItems, [id]: !likedItems[id] };
@@ -26,6 +34,16 @@ const ProductCard = ({ data, grid }) => {
     localStorage.setItem("likedItems", JSON.stringify(updatedLikes));
 
     dispatch(addToWishList(id));
+    toast.success("Thêm vào yêu thích thành công");
+  };
+
+  const addToCompare = (id) => {
+    const updatedCompares = { ...compareItems, [id]: !compareItems[id] };
+    setCompareItems(updatedCompares);
+    localStorage.setItem("compareItems", JSON.stringify(updatedCompares));
+
+    dispatch(addToCompareList(id));
+    toast.success("Thêm vào so sánh thành công");
   };
 
   const handleNavigation = (e, id) => {
@@ -55,14 +73,15 @@ const ProductCard = ({ data, grid }) => {
             } group hover:scale-105 transition-all duration-300 hover:bg-slate-100 relative select-none shadow shadow-red-400 bg-white rounded-lg`}
           >
             {/* Nút like với trạng thái được lưu trữ */}
-            <div
-              onClick={() => {
-                addToWish(item._id);
-              }}
-              className="absolute z-8 text-lg right-1 top-1 cursor-pointer"
-            >
+            <div className="absolute z-8 text-lg right-1 top-1 cursor-pointer">
               <div className="flex flex-col">
-                <Tooltip title="Like" placement="left-start">
+                <Tooltip
+                  title="Like"
+                  placement="left-start"
+                  onClick={() => {
+                    addToWish(item._id);
+                  }}
+                >
                   <IconButton>
                     <Checkbox
                       icon={<FavoriteBorder />}
@@ -81,12 +100,14 @@ const ProductCard = ({ data, grid }) => {
                     <ShoppingBagOutlinedIcon />
                   </IconButton>
                 </Tooltip>
-                <Tooltip title="So sánh" placement="left-start">
-                  <IconButton
-                    onClick={() => {
-                      navigate("/compare-product");
-                    }}
-                  >
+                <Tooltip
+                  title="So sánh"
+                  placement="left-start"
+                  onClick={() => {
+                    addToCompare(item._id);
+                  }}
+                >
+                  <IconButton>
                     <CompareArrowsOutlinedIcon />
                   </IconButton>
                 </Tooltip>
@@ -94,7 +115,9 @@ const ProductCard = ({ data, grid }) => {
             </div>
             <div className="flex justify-center items-center bg-white pointer-events-none">
               <img
-                src={images.product.watch}
+                src={
+                  "https://cdn.hoanghamobile.com/i/productlist/ts/Uploads/2024/04/26/nubia-neo-2-5g.png"
+                }
                 alt=""
                 className="object-cover h-48 w-full md:h-full md:w-48 pointer-events-none transition duration-300"
               />

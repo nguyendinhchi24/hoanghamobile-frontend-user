@@ -1,6 +1,5 @@
 import Marquee from "react-fast-marquee";
 import BlogCard from "../components/BlogCard";
-import category from "./anh1.png";
 import images from "../assets";
 import SpecialProduct from "../components/SpecialProduct";
 import ProductCardSlider from "../components/ProductCardSlider";
@@ -17,12 +16,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { getAllBlogs } from "../features/blogs/blogSlice";
 import moment from "moment";
-import ProductList from "../components/ProductList";
 import { getAllProducts } from "../features/products/productSlice";
 import { getUserCart } from "../features/user/userSlice";
 import Meta from "../components/Meta";
 import BreadCrumb from "../components/BreadCrumb";
 import { Link } from "react-router-dom";
+import ProductCard from "../components/ProductCard";
 
 const iconMap = {
   FaShippingFast: FaShippingFast,
@@ -33,14 +32,20 @@ const iconMap = {
 
 const Home = () => {
   const dispatch = useDispatch();
-  const blogState = useSelector((state) => state.blog.blogs);
-  const productState = useSelector((state) => state.product.products);
+  const blogState = useSelector((state) => state.blog.blogs) || [];
+  const productState = useSelector((state) => state.product.products) || [];
 
   useEffect(() => {
     dispatch(getAllBlogs());
     dispatch(getAllProducts());
     dispatch(getUserCart());
   }, [dispatch]);
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+    }).format(amount);
+  };
 
   return (
     <>
@@ -64,14 +69,14 @@ const Home = () => {
                   <div className="bg-white rounded-lg shadow-lg hover:shadow-2xl flex flex-col justify-center items-center bg-opacity-80 w-full lg:w-2/4 p-6 transform translate-y-16 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-transform duration-300">
                     <div className="relative z-10 text-center">
                       <h1 className="text-black text-2xl lg:text-4xl font-semibold py-1 lg:py-4">
-                        Xiaomi RedMi Note 11 Pro 5G
+                        {productState[0]?.title}
                       </h1>
                       <div className="flex items-center py-1 lg:py-4">
                         <strong className="text-lg text-red-500 mr-2 underline">
-                          Giá: 5.500.000 VNĐ
+                          Giá: {formatCurrency(productState[0]?.price)}
                         </strong>
                         <p className="text-red-500 line-through text-lg mt-2">
-                          8.500.000 đ
+                          {formatCurrency(productState[0]?.price + 200000)}
                         </p>
                       </div>
                       <p className="text-sm text-gray-700 mb-2">
@@ -80,9 +85,12 @@ const Home = () => {
                       <p className="text-sm text-gray-700 mb-4">
                         Khuyến mãi: Tặng kèm tai nghe Bluetooth
                       </p>
-                      <button className="text-white bg-slate-900 hover:bg-red-500 hover:text-white py-2 px-6 rounded-full font-semibold transition duration-300">
+                      <Link
+                        to={"/product/" + productState[0]?._id}
+                        className="text-white bg-slate-900 hover:bg-red-500 hover:text-white py-2 px-6 rounded-full font-semibold transition duration-300"
+                      >
                         Mua Ngay
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -93,7 +101,7 @@ const Home = () => {
             <div className="md:col-span-2 lg:col-span-1 xl:col-span-1 ">
               <div className="flex">
                 <div className="flex gap-6 justify-center items-center">
-                  {[...Array(4)].map((_, index) => (
+                  {productState.slice(0, 4).map((item, index) => (
                     <div
                       className="relative w-[330px] mx-auto border-2 border-gray-300 rounded-lg shadow-lg overflow-hidden transform transition duration-300 hover:scale-105"
                       key={index}
@@ -105,21 +113,18 @@ const Home = () => {
                       />
                       <div className="p-4">
                         <h4 className="text-sm text-gray-700 uppercase font-semibold tracking-wide">
-                          Xiaomi RedMi
+                          {item?.brand}
                         </h4>
                         <h1 className="text-lg text-gray-900 font-bold py-2">
-                          Xiaomi RedMi Note 11 Pro 5G
+                          {item?.title}
                         </h1>
                         <div className="flex items-center justify-between py-2">
                           <strong className="text-xl text-red-500 underline">
-                            5.500.000 VNĐ
+                            Giá chỉ còn: {formatCurrency(item?.price)}
                           </strong>
-                          <p className="text-gray-500 line-through">
-                            8.500.000 VNĐ
-                          </p>
                         </div>
                         <Link
-                          to="/product"
+                          to={"/product/" + item?._id}
                           className="block w-full text-center py-3 mt-4 bg-red-500 text-white rounded-lg font-semibold transition duration-300 hover:bg-red-600"
                         >
                           Buy Now
@@ -141,18 +146,26 @@ const Home = () => {
             className="bg-white rounded-lg p-4 grid grid-cols-1 
           sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4"
           >
-            {[...Array(8)].map((_, index) => (
+            {productState.slice(5, 9).map((item, index) => (
               <div
                 className="flex items-center rounded-lg border border-gray-300 justify-center p-4"
                 key={index}
               >
                 <div className="px-5">
-                  <h6 className="font-medium text-xl mb-2">
-                    Xiaomi Redmi Note 11 pro 5g
-                  </h6>
-                  <p className="text-sm opacity-80">Còn 5 sản phẩm</p>
+                  <h6 className="font-medium text-xl mb-2">{item?.title}</h6>
+                  <p className="text-sm opacity-80">
+                    Còn {item?.quantity} sản phẩm
+                  </p>
                 </div>
-                <img src={category} alt="" className="object-cover w-28 h-28" />
+                <img
+                  src={
+                    item?.images[0]?.url
+                      ? images.noImage.noImageProduct
+                      : "https://cdn.hoanghamobile.com/i/productlist/ts/Uploads/2024/06/04/remi12-a.png"
+                  }
+                  alt=""
+                  className="object-cover w-28 h-28 rounded-md"
+                />
               </div>
             ))}
           </div>
@@ -184,26 +197,36 @@ const Home = () => {
           </h3>
           <div className="relative grid grid-cols-1 lg:grid-cols-4 gap-4">
             {/* Sản phẩm 1 */}
-            {[...Array(4)].map((_, index) => (
-              <button
-                to="/product"
+            {productState.slice(10, 14).map((item, index) => (
+              <Link
+                to={"/product/" + item?._id}
                 key={index}
                 className="relative bg-white hover:bg-slate-200 rounded-lg shadow-lg overflow-hidden lg:col-span-1"
               >
                 <img
-                  src={images.product.watch}
-                  className="object-cover w-full h-40 lg:h-auto"
+                  src={
+                    item?.images[0]?.url
+                      ? "https://cdn.hoanghamobile.com/i/productlist/ts/Uploads/2024/04/25/reno11-f-1.png"
+                      : "https://cdn.hoanghamobile.com/i/productlist/ts/Uploads/2024/04/25/reno11-f-1.png"
+                  }
+                  className="object-cover w-52 h-38 lg:h-auto"
                   alt="Samsung Galaxy S24 Ultra"
                 />
                 <div className="p-4">
                   <p className="text-sm font-medium text-gray-600">Giảm giá</p>
                   <h2 className="text-lg lg:text-2xl font-semibold transition duration-500 text-gray-800 py-3">
-                    Galaxy S24 Ultra
+                    {item?.title}
                   </h2>
-                  <Rating readOnly defaultValue={4} size="small" />
+                  <Rating
+                    readOnly
+                    defaultValue={
+                      Number(item?.totalrating) ? Number(item?.totalrating) : 4
+                    }
+                    size="small"
+                  />
 
                   <p className="text-base font-semibold text-red-500">
-                    Giá chỉ còn 14.000.000 <sup className="text-sm">đ</sup>
+                    Giá chỉ còn: {formatCurrency(item?.price)}
                   </p>
                   <p className="text-sm text-gray-600">
                     Giảm 10% cho học sinh - sinh viên
@@ -212,7 +235,7 @@ const Home = () => {
                 <div className="absolute top-3 right-2 animate-bounce bg-red-500 px-5 py-3 rounded-lg">
                   <p className="text-sm font-semibold text-white">Trả góp 0%</p>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
         </section>
@@ -229,7 +252,7 @@ const Home = () => {
             grid grid-cols-1 md:grid-cols-4
             lg:grid-cols-8 xl:grid-cols-12 gap-4"
           >
-            <ProductList grid={2} number={6} />
+            <ProductCard grid={2} data={productState.slice(0, 6)} />
           </div>
         </section>
       </Container>
@@ -240,7 +263,7 @@ const Home = () => {
           <h3 className="text-2xl p-4 text-slate-900 font-semibold">
             Tất cả sản phẩm
           </h3>
-          <ProductCardSlider />
+          <ProductCardSlider data={productState} />
         </section>
       </Container>
 

@@ -5,8 +5,9 @@ import { Link, useNavigate } from "react-router-dom";
 import CustomInput from "../components/CustomInput";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useDispatch } from "react-redux";
-import { loginUser, resetState } from "../features/user/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../features/user/userSlice";
+import { useEffect } from "react";
 
 let loginSchema = Yup.object({
   email: Yup.string()
@@ -18,6 +19,16 @@ let loginSchema = Yup.object({
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userState = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (userState.isSuccess) {
+      window.location.reload();
+      setTimeout(() => {
+        navigate("/");
+      }, 500);
+    }
+  }, [userState.isSuccess, navigate, dispatch]);
 
   const formik = useFormik({
     initialValues: {
@@ -27,10 +38,6 @@ const Login = () => {
     validationSchema: loginSchema,
     onSubmit: (values) => {
       dispatch(loginUser(values));
-      dispatch(resetState());
-      setTimeout(() => {
-        navigate("/");
-      }, 500);
     },
   });
   return (
@@ -144,7 +151,7 @@ const Login = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="flex items-center text-sm text-gray-600">
+              <label className="sr-only flex items-center text-sm text-gray-600">
                 <CustomInput
                   className="form-checkbox h-4 w-4 text-purple-600 bg-gray-800 border-gray-300 rounded"
                   type="checkbox"
@@ -154,7 +161,6 @@ const Login = () => {
               <Link
                 to="/forgot-password"
                 className="text-sm text-gray-600 hover:underline"
-                href="#"
               >
                 Forgot your password?
               </Link>

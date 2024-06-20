@@ -20,15 +20,15 @@ import MoneyOffIcon from "@mui/icons-material/MoneyOff";
 import ElectricRickshawIcon from "@mui/icons-material/ElectricRickshaw";
 import Container from "../components/Container";
 import CustomInput from "../components/CustomInput";
-import ProductList from "./../components/ProductList";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { getAProduct } from "../features/products/productSlice";
+import { addRating, getAProduct } from "../features/products/productSlice";
 import { toast } from "react-toastify";
 import ColorComponent from "../components/ColorComponent";
 import { addProdToCart } from "../features/user/userSlice";
 import { getUserCart } from "../features/user/userSlice";
 import LoadingComponent from "./LoadingComponent";
+import useDebounce from "../hooks/useDebounce";
 
 const slides = [
   {
@@ -56,6 +56,7 @@ const sliderSettings = {
 
 const SingleProduct = () => {
   const sliderRef = useRef();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const [color, setColor] = useState(null);
@@ -65,10 +66,39 @@ const SingleProduct = () => {
   const [expanded, setExpanded] = useState(false);
   const [alreadyAdded, setAlreadyAdded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+  const [name, setName] = useState(null);
+  const [star, setStar] = useState(null);
+  const [comment, setComment] = useState(null);
+  const debouncedValue = useDebounce(comment, 700);
   const getProductId = location.pathname.split("/")[2];
   const productState = useSelector((state) => state.product.singleProduct);
   const cartState = useSelector((state) => state.auth.cartProducts);
+
+  const addRatingToProduct = () => {
+    if (name === null) {
+      toast.error("Please write your name");
+      return false;
+    } else if (star === null) {
+      toast.error("Please add star rating.");
+      return false;
+    } else if (comment === null) {
+      toast.error("Please write review about the product.");
+      return false;
+    } else {
+      dispatch(
+        addRating({
+          star: star,
+          name: name,
+          comment: debouncedValue,
+          prodId: getProductId,
+        })
+      );
+      setTimeout(() => {
+        dispatch(getAProduct(getProductId));
+      }, 300);
+    }
+    return false;
+  };
 
   const handleShowComment = () => {
     if (orderedProduct === false) {
@@ -77,12 +107,14 @@ const SingleProduct = () => {
       setOrderedProduct(false);
     }
   };
+
   useEffect(() => {
     setIsLoading(true);
     dispatch(getAProduct(getProductId));
     dispatch(getUserCart());
     const timer = setTimeout(() => {
       setIsLoading(false);
+      setOrderedProduct(false);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -432,129 +464,155 @@ const SingleProduct = () => {
             </h3>
             <div className="col-span-12 rounded-lg shadow-inner">
               <div className=" bg-white p-6 rounded-lg">
-                <h3 className="text-lg font-semibold text-gray-800">
-                  Customer Reviews
-                </h3>
-                <div className="flex justify-between text-gray-500">
-                  <div className="flex text-sm gap-3 items-center px-2 py-1">
-                    <Rating disabled defaultValue={4} size="small" />
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                      4 out of 5
-                    </p>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Customer Reviews
+                  </h3>
+                  <div className="flex justify-between text-gray-500">
+                    <div className="flex text-sm gap-3 items-center px-2 py-1">
+                      <Rating disabled defaultValue={4} size="small" />
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                        4 out of 5
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleShowComment()}
+                      className="hover:underline text-sm font-medium text-gray-500 "
+                    >
+                      Write a reviews
+                    </button>
                   </div>
-                  <button
-                    onClick={() => handleShowComment()}
-                    className="hover:underline text-sm font-medium text-gray-500 "
-                  >
-                    Write a reviews
-                  </button>
-                </div>
-                {orderedProduct && (
-                  <div className="lg:px-10 py-5 bg-white ">
-                    <div className="p-4 bg-gray-50 shadow-lg rounded-lg">
-                      <h3 className="text-lg font-semibold mb-4 text-gray-600">
-                        Write A Review
-                      </h3>
-                      {/* name */}
-                      <div className="mb-4">
-                        <label
-                          htmlFor="name"
-                          className="block text-gray-500 font-medium mb-2 text-sm"
-                        >
-                          Name
-                        </label>
-                        <CustomInput
-                          type="text"
-                          className="w-full ml-1 bg-gray-50ring-0 outline-none border border-neutral-500 text-neutral-900 placeholder-gray-400 text-sm rounded-lg focus:ring-violet-500  focus:border-violet-500 block p-2.5 checked:bg-emerald-500"
-                          placeholder="Enter your name..."
-                        />
-                      </div>
-                      {/* mail */}
-                      <div className="mb-4">
-                        <label
-                          htmlFor="mail"
-                          className="block text-gray-500 font-medium mb-2 text-sm"
-                        >
-                          Mail
-                        </label>
-                        <CustomInput
-                          type="mail"
-                          className="w-full ml-1 bg-gray-50ring-0 outline-none border border-neutral-500 text-neutral-900 placeholder-gray-400 text-sm rounded-lg focus:ring-violet-500  focus:border-violet-500 block p-2.5 checked:bg-emerald-500"
-                          placeholder="nguyenchi340702@gmail.com"
-                        />
-                      </div>
-                      {/* rating */}
-                      <div className="mb-4">
-                        <label
-                          htmlFor="ratting"
-                          className="block text-gray-500 font-medium mb-2 text-sm"
-                        >
-                          Ratting
-                        </label>
-                        <Rating defaultValue={4} size="small" />
-                      </div>
-                      {/* review title */}
-                      <div className="mb-4">
-                        <label
-                          htmlFor="review-title"
-                          className="block text-gray-500 font-medium mb-2 text-sm"
-                        >
-                          Review Title
-                        </label>
-                        <CustomInput
-                          type="text"
-                          className="w-full ml-1 bg-gray-50ring-0 outline-none border border-neutral-500 text-neutral-900 placeholder-gray-400 text-sm rounded-lg focus:ring-violet-500  focus:border-violet-500 block p-2.5 checked:bg-emerald-500"
-                          placeholder="Give your review a title..."
-                        />
-                      </div>
-                      {/* description */}
-                      <div className="mb-4">
-                        <label
-                          htmlFor="description"
-                          className="block text-gray-500 font-medium mb-2 text-sm"
-                        >
-                          Description
-                        </label>
-                        <textarea
-                          name="description"
-                          className="w-full ml-1 bg-gray-50 ring-0 outline-none border border-neutral-500 text-neutral-900 placeholder-gray-400 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block p-2.5 checked:bg-emerald-500 h-36"
-                          placeholder="Write your comments here..."
-                        ></textarea>
-                      </div>
-                      <div className="w-full flex justify-end px-5 py-3">
-                        <button
-                          className=" flex items-center duration-300 hover:gap-2 hover:-translate-x-3 justify-center gap-2 tracking-widest p-3 opacity-80 
-                      border-2 text-gray-900 w-[230px] hover:opacity-100 hover:border-red-500 px-4 bg-white rounded-lg font-medium"
-                        >
-                          <svg
-                            className="w-5 h-5 rotate-180"
-                            stroke="currentColor"
-                            strokeWidth="1.5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                  {orderedProduct && (
+                    <div className="lg:px-10 py-5 bg-white transition duration-1000">
+                      <div className="p-4 bg-gray-50 shadow-lg rounded-lg">
+                        <h3 className="text-lg font-semibold mb-4 text-gray-600">
+                          Write A Review
+                        </h3>
+                        {/* name */}
+                        <div className="mb-4">
+                          <label
+                            htmlFor="name"
+                            className="block text-gray-500 font-medium mb-2 text-sm"
                           >
-                            <path
-                              d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
-                              strokeLinejoin="round"
-                              strokeLinecap="round"
-                            ></path>
-                          </svg>
-                          <p>Submit Review</p>
-                        </button>
+                            Name
+                          </label>
+                          <CustomInput
+                            type="text"
+                            className="w-full focus:bg-white bg-gray-50 ml-1 bg-gray-50ring-0 outline-none border border-neutral-500 text-neutral-900 placeholder-gray-400 text-sm rounded-lg focus:ring-violet-500  focus:border-violet-500 block p-2.5 checked:bg-emerald-500"
+                            placeholder="Enter your name..."
+                            onChange={(e) => {
+                              setName(e.target.value);
+                            }}
+                          />
+                        </div>
+
+                        {/* rating */}
+                        <div className="mb-4">
+                          <label
+                            htmlFor="ratting"
+                            className="block text-gray-500 font-medium mb-2 text-sm"
+                          >
+                            Ratting
+                          </label>
+                          <Rating
+                            defaultValue={0}
+                            onChange={(event, newValue) => {
+                              setStar(newValue);
+                            }}
+                            size="small"
+                          />
+                        </div>
+                        {/* review */}
+                        <div className="mb-4">
+                          <label
+                            htmlFor="description"
+                            className="block text-gray-500 font-medium mb-2 text-sm"
+                          >
+                            Review
+                          </label>
+                          <textarea
+                            name="description"
+                            onChange={(e) => {
+                              setComment(e.target.value);
+                            }}
+                            className="w-full ml-1 focus:bg-white bg-gray-50 ring-0 outline-none border border-neutral-500 text-neutral-900 placeholder-gray-400 text-sm rounded-lg focus:ring-violet-500 focus:border-violet-500 block p-2.5 checked:bg-emerald-500 h-36"
+                            placeholder="Write your comments here..."
+                          ></textarea>
+                        </div>
+                        <div className="w-full flex justify-end px-5 py-3">
+                          <button
+                            onClick={addRatingToProduct}
+                            type="submit"
+                            className=" flex items-center duration-300 hover:gap-2 hover:-translate-x-3 justify-center gap-2 tracking-widest p-3 opacity-80 
+                        border-2 text-gray-900 w-[230px] hover:opacity-100 hover:border-red-500 px-4 bg-white rounded-lg font-medium"
+                          >
+                            <svg
+                              className="w-5 h-5 rotate-180"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5"
+                                strokeLinejoin="round"
+                                strokeLinecap="round"
+                              ></path>
+                            </svg>
+                            <p>Submit Review</p>
+                          </button>
+                        </div>
                       </div>
                     </div>
+                  )}
+                </div>
+                {/* show review */}
+                <div className="px-8 py-3">
+                  <div className="p-4 bg-gray-100 rounded-md">
+                    <h3 className="text-lg pb-3 font-semibold text-gray-800">
+                      Reviews
+                    </h3>
+                    {/* render */}
+                    {productState &&
+                      productState.ratings?.map((item, index) => {
+                        return (
+                          <div
+                            key={index}
+                            className="mb-5 flex bg-white items-center p-4 rounded-md shadow-md border border-gray-300"
+                          >
+                            <div className="flex justify-start text-left items-center">
+                              <img
+                                className="w-12 h-12 mr-4 rounded-md"
+                                src={images.noImage.noImageProduct}
+                              />
+                              <div className="text-sm items-center px-2 py-1">
+                                <h3 className="font-semibold text-base">
+                                  {item.name}
+                                </h3>
+                                <Rating
+                                  disabled
+                                  defaultValue={item.star}
+                                  size="small"
+                                  className="my-2"
+                                />
+                              </div>
+                            </div>
+                            <div className="text-sm px-10 py-3 font-thin">
+                              <strong>{item.comment}</strong>
+                            </div>
+                          </div>
+                        );
+                      })}
                   </div>
-                )}
+                </div>
               </div>
-
-              {/*  */}
             </div>
           </div>
         </section>
       </Container>
       {/*  */}
-      <Container>
+      {/* <Container>
         <section className="p-5">
           <h3 className="text-2xl p-4 text-slate-900 font-semibold">
             Bộ sửu tập
@@ -567,7 +625,7 @@ const SingleProduct = () => {
             <ProductList grid={2} number={6} />
           </div>
         </section>
-      </Container>
+      </Container> */}
     </>
   );
 };

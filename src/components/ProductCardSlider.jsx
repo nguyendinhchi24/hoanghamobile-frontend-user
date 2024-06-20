@@ -1,38 +1,35 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-
+import PropTypes from "prop-types";
 import "swiper/css";
 import "swiper/css/navigation";
 import images from "../assets";
-import { useDispatch } from "react-redux";
-import { getAllProducts } from "../features/products/productSlice";
-import { useEffect } from "react";
-import ProductList from "./ProductList";
+import ProductCard from "./ProductCard";
+import { Link } from "react-router-dom";
 
-export default function App() {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(getAllProducts());
-  }, [dispatch]);
-
+const ProductCartSlider = ({ data }) => {
   return (
     <>
       <div className="grid xl:grid-cols-5 lg:grid-cols-4 grid-cols-1 gap-5">
         {/* */}
         <div className="max-md:col-span-1 py-3 px-3 lg:block hidden rounded-lg bg-white scroll-smooth overflow-hidden lg:overflow-auto lg:max-h-[430px]">
-          {[...Array(3)].map((_, index) => (
-            <div
+          {data.slice(0, 8).map((item, index) => (
+            <Link
+              to={`/product/${item._id}`}
               key={index}
               className="flex bg-slate-50 hover:bg-slate-200 cursor-pointer rounded-lg p-3 items-center mb-3"
             >
               <img
-                src={images.product.watch}
+                src={
+                  item?.images[0]?.url
+                    ? images.noImage.noImageProduct
+                    : images.noImage.noImageProduct
+                }
                 alt=""
                 className="h-14 w-14 rounded-lg"
               />
-              <p className="font-semibold text-[17px] px-5">Iphone</p>
-            </div>
+              <p className="font-semibold text-[17px] px-5">{item?.title}</p>
+            </Link>
           ))}
         </div>
 
@@ -52,7 +49,7 @@ export default function App() {
         <div className="col-span-2 py-3 bg-white rounded-lg lg:col-span-3 xl:col-span-3">
           <Swiper
             slidesPerView={1}
-            spaceBetween={8}
+            spaceBetween={12}
             rewind={true}
             modules={[Navigation]}
             className="p-2"
@@ -65,16 +62,45 @@ export default function App() {
               },
             }}
           >
-            {[...Array(8)].map((_, index) => {
-              return (
-                <SwiperSlide key={index} className="px-4">
-                  <ProductList number={1} grid={2} />
-                </SwiperSlide>
-              );
-            })}
+            <SwiperSlide>
+              <ProductCard data={data.slice(0, 1)} grid={2} />
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard data={data.slice(1, 2)} grid={2} />
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard data={data.slice(2, 3)} grid={2} />
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard data={data.slice(3, 4)} grid={2} />
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard data={data.slice(4, 5)} grid={2} />
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard data={data.slice(5, 6)} grid={2} />
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard data={data.slice(6, 7)} grid={2} />
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard data={data.slice(7, 8)} grid={2} />
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard data={data.slice(8, 9)} grid={2} />
+            </SwiperSlide>
+            <SwiperSlide>
+              <ProductCard data={data.slice(9, 10)} grid={2} />
+            </SwiperSlide>
           </Swiper>
         </div>
       </div>
     </>
   );
-}
+};
+
+export default ProductCartSlider;
+
+ProductCartSlider.propTypes = {
+  data: PropTypes.array.isRequired,
+};

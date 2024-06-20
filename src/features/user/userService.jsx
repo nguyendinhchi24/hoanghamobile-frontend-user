@@ -16,9 +16,28 @@ const login = async (userData) => {
     return response.data;
   }
 };
+const logOut = async (userData) => {
+  try {
+    const response = await axios.post(`${base_url}user/logout`, userData);
+    if (response.data) {
+      localStorage.removeItem("customer");
+      return response.data;
+    }
+  } catch (error) {
+    console.error("Error logging out:", error);
+    throw new Error("Failed to log out");
+  }
+};
 
 const getUserWishList = async () => {
   const response = await axios.get(`${base_url}user/wishlist`, config);
+  if (response.data) {
+    return response.data;
+  }
+};
+
+const getUserCompareList = async () => {
+  const response = await axios.get(`${base_url}user/comparelist`, config);
   if (response.data) {
     return response.data;
   }
@@ -92,6 +111,33 @@ const getUserOrders = async () => {
   }
 };
 
+const updateUser = async (data) => {
+  const response = await axios.put(`${base_url}user/edit-user`, data, config);
+  if (response.data) {
+    return response.data;
+  }
+};
+
+const forgotPassToken = async (data) => {
+  const response = await axios.post(
+    `${base_url}user/forgot-password-token`,
+    data
+  );
+  if (response.data) {
+    return response.data;
+  }
+};
+
+const resetPass = async (data) => {
+  const response = await axios.put(
+    `${base_url}user/reset-password/${data.token}`,
+    { password: data?.password }
+  );
+  if (response.data) {
+    return response.data;
+  }
+};
+
 export const authService = {
   register,
   createOrder,
@@ -103,4 +149,9 @@ export const authService = {
   updateProductFromCart,
   getUserOrders,
   checkOut,
+  logOut,
+  updateUser,
+  forgotPassToken,
+  resetPass,
+  getUserCompareList,
 };

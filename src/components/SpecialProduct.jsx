@@ -9,6 +9,7 @@ import LinearProgress, {
 } from "@mui/material/LinearProgress";
 import { Link } from "react-router-dom";
 import { PropTypes } from "prop-types";
+import { useEffect, useState } from "react";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 10,
@@ -24,6 +25,35 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 }));
 
 const SpecialProduct = ({ data }) => {
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + 4);
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+
+  function calculateTimeLeft() {
+    const now = new Date();
+    const difference = targetDate.getTime() - now.getTime();
+
+    if (difference > 0) {
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((difference / 1000 / 60) % 60);
+      const seconds = Math.floor((difference / 1000) % 60);
+      return { days, hours, minutes, seconds };
+    } else {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
+  }
+
+  useEffect(() => {
+    const countdownInterval = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+
+    return () => clearInterval(countdownInterval);
+  }, []);
+
+  const { days, hours, minutes, seconds } = timeLeft;
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
       style: "currency",
@@ -58,28 +88,32 @@ const SpecialProduct = ({ data }) => {
                     size="small"
                   />
                   <p className="text-red-600 text-base font-medium flex">
-                    <span>{formatCurrency(item.price)}</span> &nbsp;{" "}
-                    <strike className="text-gray-500">8.500.000 VNĐ</strike>
+                    <span>{formatCurrency(item?.price)}</span> &nbsp;
+                    <strike className="text-gray-500">
+                      {formatCurrency(item?.price + 1000000)}
+                    </strike>
                   </p>
+                  {/*  */}
                   <div className="flex items-center p-3 gap-2">
                     <p className="font-semibold text-lg">
-                      500&nbsp;
+                      {days}&nbsp;
                       <span className="opacity-70 text-base">Days</span>
                     </p>
                     <div className="flex items-center gap-2 font-semibold">
                       <span className="rounded-full p-2 bg-red-600 text-white">
-                        12
+                        {hours < 10 ? `0${hours}` : hours}
                       </span>
                       :
                       <span className="rounded-full p-2 bg-red-600 text-white">
-                        14
+                        {minutes < 10 ? `0${minutes}` : minutes}
                       </span>
                       :
                       <span className="rounded-full p-2 bg-red-600 text-white">
-                        60
+                        {seconds < 10 ? `0${seconds}` : seconds}
                       </span>
                     </div>
                   </div>
+                  {/*  */}
                   <div>
                     <p className="text-sm py-3 opacity-70 font-medium">
                       Còn {item.quantity} sản phẩm
@@ -103,7 +137,7 @@ const SpecialProduct = ({ data }) => {
                     </div>
 
                     <Link
-                      to="/cart"
+                      to={`/product/${item._id}`}
                       className="shadow-md flex items-center group-hover:gap-2 bg-gradient-to-br from-lime-200 to-yellow-200 p-3 rounded-full cursor-pointer duration-300"
                     >
                       <FaBagShopping className="text-xl" />
